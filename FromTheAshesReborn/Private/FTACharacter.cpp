@@ -3,6 +3,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -13,20 +14,34 @@
 AFTACharacter::AFTACharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+
+	GetCharacterMovement()->JumpZVelocity = 1700.f;
+	GetCharacterMovement()->AirControl = 0.35f;
+	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+
+	RootComponent = GetCapsuleComponent();
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
-	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->TargetArmLength = 400.0f;
+	SpringArmComp->bUsePawnControlRotation = true;
 
 	SpringArmComp->SetUsingAbsoluteRotation(true);
+	SpringArmComp->bUsePawnControlRotation = true;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
-
-
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	bUseControllerRotationYaw = false;
-
+	CameraComp->bUsePawnControlRotation = false;
 }
 
 void AFTACharacter::BeginPlay()
@@ -38,6 +53,29 @@ void AFTACharacter::BeginPlay()
 void AFTACharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+EStates AFTACharacter::GetState() const
+{
+	return CurrentState;
+}
+
+void AFTACharacter::SetState(EStates NewState)
+{
+	if (CurrentState != NewState)
+	{
+		CurrentState = NewState;
+	}
+}
+
+bool AFTACharacter::IsStateEqualToAny(TArray<EStates> StatesToCheck)
+{
+	if (StatesToCheck.Contains(CurrentState))
+	{
+		return true;
+	}
+	return false;
 
 }
 
@@ -70,10 +108,13 @@ void AFTACharacter::Move(const FInputActionInstance& Instance)
 	ControlRot.Pitch = 0.0f;
 	ControlRot.Roll = 0.0f;
 
+	// Get value from input (combined value from WASD keys or single Gamepad stick) and convert to Vector (x,y)
 	const FVector2D AxisValue = Instance.GetValue().Get<FVector2D>();
 
+	// Move forward/back
 	AddMovementInput(ControlRot.Vector(), AxisValue.Y);
 
+	// Move Right/Left strafe
 	const FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
 	AddMovementInput(RightVector, AxisValue.X);
 }
@@ -83,7 +124,7 @@ void AFTACharacter::LookMouse(const FInputActionValue& InputValue)
 	const FVector2D Value = InputValue.Get<FVector2D>();
 
 	AddControllerYawInput(Value.X);
-	AddControllerPitchInput(Value.Y);
+	AddControllerPitchInput(-Value.Y);
 }
 
 void AFTACharacter::LookStick(const FInputActionValue& InputValue)

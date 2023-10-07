@@ -4,22 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-
+#include "EStates.h"
 #include "InputAction.h"
 #include "FTACharacter.generated.h"
-
-//class UInputMappingContext;
-//class UCameraComponent;
-//class USpringArmComponent;
 
 class UInputMappingContext;
 class UCameraComponent;
 class USpringArmComponent;
-class USInteractionComponent;
-class UAnimMontage;
-class USAttributeComponent;
-class UParticleSystem;
-class USActionComponent;
+
 
 UCLASS()
 class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter
@@ -57,6 +49,16 @@ protected:
 
 	void LookStick(const FInputActionValue& InputValue);
 
+private:
+	UFUNCTION(BlueprintPure, Category = "FSM")
+	EStates GetState() const;
+
+	UFUNCTION(Category = "FSM")
+	void SetState(EStates NewState);
+
+	UFUNCTION(BlueprintPure, Category = "FSM")
+	bool IsStateEqualToAny(TArray<EStates> StatesToCheck);
+
 public:
 	AFTACharacter();
 
@@ -65,5 +67,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
+	EStates CurrentState;
 
 };
