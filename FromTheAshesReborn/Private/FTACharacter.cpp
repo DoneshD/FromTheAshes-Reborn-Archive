@@ -47,7 +47,7 @@ AFTACharacter::AFTACharacter()
 void AFTACharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	bCanDodge = true;
 }
 
 void AFTACharacter::Tick(float DeltaTime)
@@ -76,7 +76,19 @@ bool AFTACharacter::IsStateEqualToAny(TArray<EStates> StatesToCheck)
 		return true;
 	}
 	return false;
+}
 
+bool AFTACharacter::CanJump()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Execution, EStates::EState_Dodge };
+	bool inState = IsStateEqualToAny(MakeArray);
+	return !inState && bCanDodge && !GetCharacterMovement()->IsFalling();
+}
+
+bool AFTACharacter::CanDodge()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
+	return !IsStateEqualToAny(MakeArray);
 }
 
 void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -102,13 +114,13 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
 
 }
+
 void AFTACharacter::Move(const FInputActionInstance& Instance)
 {
 	FRotator ControlRot = GetControlRotation();
 	ControlRot.Pitch = 0.0f;
 	ControlRot.Roll = 0.0f;
 
-	// Get value from input (combined value from WASD keys or single Gamepad stick) and convert to Vector (x,y)
 	const FVector2D AxisValue = Instance.GetValue().Get<FVector2D>();
 
 	// Move forward/back

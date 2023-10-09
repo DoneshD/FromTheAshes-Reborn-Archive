@@ -19,7 +19,6 @@ class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -43,11 +42,16 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComp;
 
+	//Basic controls
 	void Move(const FInputActionInstance& Instance);
-
 	void LookMouse(const FInputActionValue& InputValue);
-
 	void LookStick(const FInputActionValue& InputValue);
+
+	//FSM checks
+	bool CanJump();
+	bool CanDodge();
+	
+	bool bCanDodge;
 
 private:
 	UFUNCTION(BlueprintPure, Category = "FSM")
@@ -62,13 +66,12 @@ private:
 public:
 	AFTACharacter();
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 	EStates CurrentState;
+
 
 };

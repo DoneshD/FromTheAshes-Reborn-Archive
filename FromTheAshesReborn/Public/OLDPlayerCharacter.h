@@ -11,7 +11,7 @@
 #include "GameFramework/Controller.h"
 #include "EStates.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "PlayerCharacter.generated.h"
+#include "OLDPlayerCharacter.generated.h"
 
 
 UCLASS()
