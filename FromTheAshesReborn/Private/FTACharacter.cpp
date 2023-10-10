@@ -95,24 +95,32 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	const APlayerController* PC = GetController<APlayerController>();
-	const ULocalPlayer* LP = PC->GetLocalPlayer();
+	const APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	
+	if (PlayerController)
+	{
+		const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+		if (LocalPlayer)
+		{
+			UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+			check(Subsystem);
 
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-	check(Subsystem);
+			Subsystem->ClearAllMappings();
+			Subsystem->AddMappingContext(DefaultInputMapping, 0);
+		}
+	}
 
-	Subsystem->ClearAllMappings();
+	UEnhancedInputComponent* InputComp = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	Subsystem->AddMappingContext(DefaultInputMapping, 0);
+	if (InputComp)
+	{
+		InputComp->BindAction(Input_Move, ETriggerEvent::Triggered, this, &AFTACharacter::Move);
+		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::StopJumping);
 
-	UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-
-	InputComp->BindAction(Input_Move, ETriggerEvent::Triggered, this, &AFTACharacter::Move);
-	InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-
-	InputComp->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &AFTACharacter::LookMouse);
-	InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
-
+		InputComp->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &AFTACharacter::LookMouse);
+		InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
+	}
 }
 
 void AFTACharacter::Move(const FInputActionInstance& Instance)
