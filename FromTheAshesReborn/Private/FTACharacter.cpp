@@ -116,7 +116,7 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	{
 		InputComp->BindAction(Input_Move, ETriggerEvent::Triggered, this, &AFTACharacter::Move);
 		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::StopJumping);
+		InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		InputComp->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &AFTACharacter::LookMouse);
 		InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);

@@ -51,6 +51,7 @@ protected:
 	bool CanJump();
 	bool CanDodge();
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 	bool bCanDodge;
 
 private:
@@ -72,6 +73,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 	EStates CurrentState;
-
-
 };
