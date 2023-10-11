@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "PlayableCharacter.generated.h"
 
 /**
@@ -16,7 +17,7 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 
 	
 protected:
-
+	APlayableCharacter();
 
 private:
 
