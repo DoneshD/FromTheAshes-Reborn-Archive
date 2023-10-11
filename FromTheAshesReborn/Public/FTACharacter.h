@@ -46,23 +46,22 @@ protected:
 	void Move(const FInputActionInstance& Instance);
 	void LookMouse(const FInputActionValue& InputValue);
 	void LookStick(const FInputActionValue& InputValue);
+
 	void DoubleJump();
+	void StopJump();
 
 	//FSM checks
 	bool CanJump();
 	bool CanDodge();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 	bool bCanDodge;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
+	int JumpCount = 0;
+
 private:
-	UFUNCTION(BlueprintPure, Category = "FSM")
 	EStates GetState() const;
-
-	UFUNCTION(Category = "FSM")
 	void SetState(EStates NewState);
-
-	UFUNCTION(BlueprintPure, Category = "FSM")
 	bool IsStateEqualToAny(TArray<EStates> StatesToCheck);
 
 public:
@@ -71,7 +70,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 	EStates CurrentState;
 };

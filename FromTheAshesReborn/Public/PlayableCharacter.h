@@ -19,8 +19,6 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 protected:
 	APlayableCharacter();
 
-	void DoubleJump();
-
 private:
 
 

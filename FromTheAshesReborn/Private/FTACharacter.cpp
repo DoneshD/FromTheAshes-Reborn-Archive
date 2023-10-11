@@ -71,18 +71,13 @@ void AFTACharacter::SetState(EStates NewState)
 
 bool AFTACharacter::IsStateEqualToAny(TArray<EStates> StatesToCheck)
 {
-	if (StatesToCheck.Contains(CurrentState))
-	{
-		return true;
-	}
-	return false;
+	return StatesToCheck.Contains(CurrentState);
 }
 
 bool AFTACharacter::CanJump()
 {
-	TArray<EStates> MakeArray = { EStates::EState_Execution, EStates::EState_Dodge };
-	bool inState = IsStateEqualToAny(MakeArray);
-	return !inState && bCanDodge && !GetCharacterMovement()->IsFalling();
+	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
+	return !IsStateEqualToAny(MakeArray);
 }
 
 bool AFTACharacter::CanDodge()
@@ -115,8 +110,8 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	if (InputComp)
 	{
 		InputComp->BindAction(Input_Move, ETriggerEvent::Triggered, this, &AFTACharacter::Move);
-		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &AFTACharacter::DoubleJump);
-		//InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &AFTACharacter::StopJumping);
+		InputComp->BindAction(Input_Jump, ETriggerEvent::Started, this, &AFTACharacter::DoubleJump);
+		InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &AFTACharacter::StopJump);
 
 		InputComp->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &AFTACharacter::LookMouse);
 		InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
@@ -125,7 +120,28 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AFTACharacter::DoubleJump()
 {
-	Jump();
+	if (CanJump())
+	{
+		Jump();
+		JumpCount++;
+		if (!GetCharacterMovement()->IsFalling())
+		{
+			JumpCount = 0;
+		}
+		else
+		{
+			if (JumpCount < 2)
+			{
+				Jump();
+			}
+		}
+	}
+}
+
+void AFTACharacter::StopJump()
+{
+	StopJumping();
+	JumpCount = 0;
 }
 
 void AFTACharacter::Move(const FInputActionInstance& Instance)
