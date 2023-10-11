@@ -19,3 +19,8 @@ APlayableCharacter::APlayableCharacter()
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 }
+
+void APlayableCharacter::DoubleJump()
+{
+	Jump();
+}

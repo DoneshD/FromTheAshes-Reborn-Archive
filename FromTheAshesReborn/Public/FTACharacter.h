@@ -46,6 +46,7 @@ protected:
 	void Move(const FInputActionInstance& Instance);
 	void LookMouse(const FInputActionValue& InputValue);
 	void LookStick(const FInputActionValue& InputValue);
+	void DoubleJump();
 
 	//FSM checks
 	bool CanJump();

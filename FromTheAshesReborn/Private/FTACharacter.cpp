@@ -115,12 +115,17 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	if (InputComp)
 	{
 		InputComp->BindAction(Input_Move, ETriggerEvent::Triggered, this, &AFTACharacter::Move);
-		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		InputComp->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &AFTACharacter::DoubleJump);
+		//InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &AFTACharacter::StopJumping);
 
 		InputComp->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &AFTACharacter::LookMouse);
 		InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
 	}
+}
+
+void AFTACharacter::DoubleJump()
+{
+	Jump();
 }
 
 void AFTACharacter::Move(const FInputActionInstance& Instance)
