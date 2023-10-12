@@ -97,4 +97,10 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void APlayableCharacter::LightAttack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("nice"));
+	UE_LOG(LogTemp, Warning, TEXT("nice"));
+	UE_LOG(LogTemp, Warning, TEXT("nice"));
+	UE_LOG(LogTemp, Warning, TEXT("nice"));
+	UE_LOG(LogTemp, Warning, TEXT("nice"));
+	UE_LOG(LogTemp, Warning, TEXT("nice"));
+	//Test commit
 }
