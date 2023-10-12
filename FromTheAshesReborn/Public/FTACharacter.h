@@ -59,10 +59,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
 	int JumpCount = 0;
 
-private:
+	//FSM functions
 	EStates GetState() const;
 	void SetState(EStates NewState);
 	bool IsStateEqualToAny(TArray<EStates> StatesToCheck);
+
+private:
 
 public:
 	AFTACharacter();

@@ -2,6 +2,8 @@
 
 
 #include "PlayableCharacter.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 APlayableCharacter::APlayableCharacter()
 {
@@ -18,5 +20,81 @@ APlayableCharacter::APlayableCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	ResetState();
 }
 
+void APlayableCharacter::ResetLightAttack()
+{
+	LightAttackIndex = 0;
+	bLightAttackSaved = false;
+}
+
+void APlayableCharacter::ResetHeavyAttack()
+{
+	HeavyAttackIndex = 0;
+	NewHeavyAttackIndex = 0;
+
+	bHeavyAttackSaved = false;
+	bHeavyAttackPaused = false;
+
+	//TODO: Clear Timer by Function Name
+}
+
+void APlayableCharacter::ResetAirAttack()
+{
+	AirComboIndex = 0;
+	bLaunched = false;
+}
+
+void APlayableCharacter::ResetDodge()
+{
+	bDodgeSaved = false;
+	bCanRoll = false;
+	bCanDodge = true;
+}
+
+void APlayableCharacter::ResetState()
+{
+	if (GetCharacterMovement()->IsFalling())
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+	}
+
+	SetState(EStates::EState_Nothing);
+
+	ResetLightAttack();
+	ResetHeavyAttack();
+	ResetAirAttack();
+}
+
+void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	const APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	if (PlayerController)
+	{
+		const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+		if (LocalPlayer)
+		{
+			UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+			check(Subsystem);
+
+			Subsystem->ClearAllMappings();
+			Subsystem->AddMappingContext(DefaultInputMapping, 0);
+		}
+	}
+
+	UEnhancedInputComponent* InputComp = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+
+	if (InputComp)
+	{
+		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::LightAttack);
+	}
+}
+
+void APlayableCharacter::LightAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("nice"));
+}
