@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Animation/AnimMontage.h"
 #include "PlayableCharacter.generated.h"
 
 /**
@@ -24,7 +23,9 @@ protected:
 	TObjectPtr<UInputAction> Input_LightAttack;
 
 	//FSM Reset States
+	UFUNCTION(BlueprintCallable, Category = "FSM")
 	void ResetState();
+
 	void ResetLightAttack();
 	void ResetHeavyAttack();
 	void ResetAirAttack();
@@ -38,8 +39,10 @@ protected:
 	void LightAttack();
 	void PerformLightAttack(int LightAttackIndex);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
-	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
+	// Save Attacks
+	UFUNCTION(BlueprintCallable, Category = "Light Attack")
+	void SaveLightAttack();
+
 
 private:
 
@@ -62,10 +65,8 @@ private:
 	int AirComboIndex;
 	bool bLaunched;
 
-
-
-
-
+	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
+	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
 
 	bool bExecuting;
 

@@ -23,6 +23,8 @@ APlayableCharacter::APlayableCharacter()
 	ResetState();
 }
 
+//----------------------------------------------- FSM Resets -----------------------------------------------------------------//
+
 void APlayableCharacter::ResetLightAttack()
 {
 	LightAttackIndex = 0;
@@ -100,9 +102,45 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
+//----------------------------------------------- Attack Saves -----------------------------------------------------------------//
+
+void APlayableCharacter::SaveLightAttack()
+{
+	if (bLightAttackSaved)
+	{
+		bLightAttackSaved = false;
+		TArray<EStates> MakeArray = { EStates::EState_Attack };
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Nothing);
+		}
+		LightAttack();
+	}
+}
+
+//----------------------------------------------- Attack Actions -----------------------------------------------------------------//
+
 void APlayableCharacter::PerformLightAttack(int AttackIndex)
 {
-
+	UAnimMontage* CurrentMontage = LightAttackCombo[AttackIndex];
+	if (CurrentMontage)
+	{
+		//StopBuffer()
+		//Buffer()
+		SetState(EStates::EState_Attack);
+		//SoftLock()
+		PlayAnimMontage(CurrentMontage);
+		LightAttackIndex++;
+		if (LightAttackIndex >= LightAttackCombo.Num())
+		{
+			LightAttackIndex = 0;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"))
+	}
+	
 }
 
 void APlayableCharacter::LightAttack()
