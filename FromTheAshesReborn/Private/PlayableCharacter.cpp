@@ -14,7 +14,7 @@ APlayableCharacter::APlayableCharacter()
 	GetCharacterMovement()->AirControlBoostMultiplier = 6.f;
 
 	//Walk and crouch
-	GetCharacterMovement()->CrouchedHalfHeight = 48.f;
+	GetCharacterMovement()->SetCrouchedHalfHeight(48.f);
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
@@ -67,6 +67,12 @@ void APlayableCharacter::ResetState()
 	ResetAirAttack();
 }
 
+bool APlayableCharacter::CanAttack()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Execution };
+	return !GetCharacterMovement()->IsFalling() && !GetCharacterMovement()->IsFlying() && !IsStateEqualToAny(MakeArray);
+}
+
 void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -90,17 +96,45 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	if (InputComp)
 	{
-		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::LightAttack);
+		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputLightAttack);
 	}
+}
+
+void APlayableCharacter::PerformLightAttack(int AttackIndex)
+{
+
 }
 
 void APlayableCharacter::LightAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("nice"));
-	UE_LOG(LogTemp, Warning, TEXT("nice"));
-	UE_LOG(LogTemp, Warning, TEXT("nice"));
-	UE_LOG(LogTemp, Warning, TEXT("nice"));
-	UE_LOG(LogTemp, Warning, TEXT("nice"));
-	UE_LOG(LogTemp, Warning, TEXT("nice"));
-	//Test commit
+	if (CanAttack())
+	{
+		//CanLaunch()
+		//DodgeAttacks SHOULD REFACTOR
+		ResetHeavyAttack();
+		PerformLightAttack(LightAttackIndex);
+
+	}
+	else 
+	{
+		//Air attack logc
+	}
+}
+
+void APlayableCharacter::InputLightAttack()
+{
+	//Light attack held to true
+	bDodgeSaved = false;
+	//condition for assassinate
+	bHeavyAttackSaved = false;
+
+	TArray<EStates> MakeArray = { EStates::EState_Attack };
+	if (IsStateEqualToAny(MakeArray))
+	{
+		bLightAttackSaved = true;
+	}
+	else 
+	{
+		LightAttack();
+	}
 }

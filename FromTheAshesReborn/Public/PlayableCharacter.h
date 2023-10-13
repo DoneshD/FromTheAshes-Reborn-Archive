@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Animation/AnimMontage.h"
 #include "PlayableCharacter.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
 class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 {
@@ -28,8 +30,16 @@ protected:
 	void ResetAirAttack();
 	void ResetDodge();
 
+	//FSM Attack Check
+	bool CanAttack();
+
 	//Light attacks
+	void InputLightAttack();
 	void LightAttack();
+	void PerformLightAttack(int LightAttackIndex);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
+	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
 
 private:
 
@@ -39,7 +49,7 @@ private:
 	bool bCanDodge;
 
 	//Light Attack
-	int LightAttackIndex;
+	int LightAttackIndex = 0;
 	bool bLightAttackSaved;
 
 	//Heavy Attack
@@ -53,10 +63,13 @@ private:
 	bool bLaunched;
 
 
+
+
+
+
 	bool bExecuting;
 
 public:
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
