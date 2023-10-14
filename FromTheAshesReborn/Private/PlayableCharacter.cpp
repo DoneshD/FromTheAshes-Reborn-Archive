@@ -122,7 +122,18 @@ void APlayableCharacter::SaveLightAttack()
 
 void APlayableCharacter::SaveHeavyAttack()
 {
-	
+	if (bHeavyAttackSaved)
+	{
+		bHeavyAttackSaved = false;
+		//Air Slam()
+		TArray<EStates> MakeArray = { EStates::EState_Attack };
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Nothing);
+		}
+		//NewHeavyCombo
+		HeavyAttack();
+	}
 }
 
 //----------------------------------------------- Light Attack Actions -----------------------------------------------------------------//
@@ -145,7 +156,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"))
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
 	}
 	
 }
@@ -188,15 +199,59 @@ void APlayableCharacter::InputLightAttack()
 
 void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 {
-	
+	UAnimMontage* CurrentMontage = HeavyAttackCombo[AttackIndex];
+	if (CurrentMontage)
+	{
+		//StopBuffer()
+		//Buffer()
+		SetState(EStates::EState_Attack);
+		//SoftLock()
+		PlayAnimMontage(CurrentMontage);
+		//SetTimerByEvent
+		HeavyAttackIndex++;
+		if (HeavyAttackIndex >= HeavyAttackCombo.Num())
+		{
+			HeavyAttackIndex = 0;
+			//ClearTimer
+			bHeavyAttackPaused = false;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
+	}
 }
 
 void APlayableCharacter::HeavyAttack()
 {
-	
+	if (CanAttack())
+	{
+		//Clear Timer : Attack Paused
+		bHeavyAttackPaused = false;
+		ResetLightAttack();
+		PerformHeavyAttack(HeavyAttackIndex);
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Error"));
+	}
 }
 
 void APlayableCharacter::InputHeavyAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fabian Aguilar Gomez"));
+	bDodgeSaved = false;
+	bLightAttackSaved = false;
+
+	//AirSlam()
+
+	TArray<EStates> MakeArray = { EStates::EState_Attack };
+	if (IsStateEqualToAny(MakeArray))
+	{
+		bHeavyAttackSaved = true;
+	}
+	else
+	{
+		HeavyAttack();
+	}
 }
