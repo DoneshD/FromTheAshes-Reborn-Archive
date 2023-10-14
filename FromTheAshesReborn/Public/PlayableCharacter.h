@@ -19,8 +19,12 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 	
 protected:
 	APlayableCharacter();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LightAttack;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_HeavyAttack;
 
 	//FSM Reset States
 	UFUNCTION(BlueprintCallable, Category = "FSM")
@@ -34,14 +38,22 @@ protected:
 	//FSM Attack Check
 	bool CanAttack();
 
-	//Light attacks
+	//Light Attacks
 	void InputLightAttack();
 	void LightAttack();
 	void PerformLightAttack(int LightAttackIndex);
 
+	//Heavy Attacks
+	void InputHeavyAttack();
+	void HeavyAttack();
+	void PerformHeavyAttack(int HeavyAttackIndex);
+
 	// Save Attacks
 	UFUNCTION(BlueprintCallable, Category = "Light Attack")
 	void SaveLightAttack();
+
+	UFUNCTION(BlueprintCallable, Category = "Light Attack")
+	void SaveHeavyAttack();
 
 
 private:
@@ -56,8 +68,8 @@ private:
 	bool bLightAttackSaved;
 
 	//Heavy Attack
-	int HeavyAttackIndex;
-	int NewHeavyAttackIndex;
+	int HeavyAttackIndex = 0;
+	int NewHeavyAttackIndex = 0;
 	bool bHeavyAttackSaved;
 	bool bHeavyAttackPaused;
 

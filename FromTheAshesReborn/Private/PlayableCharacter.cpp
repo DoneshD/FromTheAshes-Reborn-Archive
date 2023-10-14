@@ -99,6 +99,8 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	if (InputComp)
 	{
 		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputLightAttack);
+		InputComp->BindAction(Input_HeavyAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputHeavyAttack);
+
 	}
 }
 
@@ -118,7 +120,12 @@ void APlayableCharacter::SaveLightAttack()
 	}
 }
 
-//----------------------------------------------- Attack Actions -----------------------------------------------------------------//
+void APlayableCharacter::SaveHeavyAttack()
+{
+	
+}
+
+//----------------------------------------------- Light Attack Actions -----------------------------------------------------------------//
 
 void APlayableCharacter::PerformLightAttack(int AttackIndex)
 {
@@ -155,7 +162,7 @@ void APlayableCharacter::LightAttack()
 	}
 	else 
 	{
-		//Air attack logc
+		//Air attack logic
 	}
 }
 
@@ -175,4 +182,21 @@ void APlayableCharacter::InputLightAttack()
 	{
 		LightAttack();
 	}
+}
+
+//----------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
+
+void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
+{
+	
+}
+
+void APlayableCharacter::HeavyAttack()
+{
+	
+}
+
+void APlayableCharacter::InputHeavyAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fabian Aguilar Gomez"));
 }
