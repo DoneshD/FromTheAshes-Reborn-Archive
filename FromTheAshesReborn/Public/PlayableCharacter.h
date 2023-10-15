@@ -7,6 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayableCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackPausedEvent);
+
 /**
  * 
  */
@@ -48,12 +50,21 @@ protected:
 	void HeavyAttack();
 	void PerformHeavyAttack(int HeavyAttackIndex);
 
+
 	// Save Attacks
 	UFUNCTION(BlueprintCallable, Category = "Light Attack")
 	void SaveLightAttack();
 
 	UFUNCTION(BlueprintCallable, Category = "Light Attack")
 	void SaveHeavyAttack();
+
+	//Timed Attacks
+	void StartAttackPausedTimer();
+	void ClearAttackPausedTimer();
+
+	UFUNCTION()
+	void HeavyAttackPaused();
+
 
 
 private:
@@ -83,7 +94,13 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> HeavyAttackCombo;
 
+	//Timers
+	FTimerHandle AttackPauseHandle;
+	FOnAttackPausedEvent OnAttackPausedEvent;
+
 	bool bExecuting;
+
+	
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

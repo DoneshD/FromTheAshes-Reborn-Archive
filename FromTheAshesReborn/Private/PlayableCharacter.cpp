@@ -131,10 +131,27 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		//NewHeavyCombo
+		//NewHeavyCombo()
 		HeavyAttack();
 	}
 }
+
+void APlayableCharacter::StartAttackPausedTimer()
+{
+	GetWorldTimerManager().SetTimer(AttackPauseHandle, this, &APlayableCharacter::HeavyAttackPaused, .8, true);
+}
+
+void APlayableCharacter::ClearAttackPausedTimer()
+{
+	GetWorldTimerManager().ClearTimer(AttackPauseHandle);
+}
+
+void APlayableCharacter::HeavyAttackPaused()
+{
+	bHeavyAttackPaused = true;
+	OnAttackPausedEvent.Broadcast();
+}
+
 
 //----------------------------------------------- Light Attack Actions -----------------------------------------------------------------//
 
@@ -166,7 +183,7 @@ void APlayableCharacter::LightAttack()
 	if (CanAttack())
 	{
 		//CanLaunch()
-		//DodgeAttacks SHOULD REFACTOR
+		//DodgeAttacks() SHOULD REFACTOR
 		ResetHeavyAttack();
 		PerformLightAttack(LightAttackIndex);
 
