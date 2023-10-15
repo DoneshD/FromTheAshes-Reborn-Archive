@@ -48,7 +48,9 @@ protected:
 	//Heavy Attacks
 	void InputHeavyAttack();
 	void HeavyAttack();
+	void NewHeavyCombo();
 	void PerformHeavyAttack(int HeavyAttackIndex);
+	void PerformHeavyCombo();
 
 
 	// Save Attacks

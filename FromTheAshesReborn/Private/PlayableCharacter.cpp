@@ -20,7 +20,6 @@ APlayableCharacter::APlayableCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	ResetState();
 }
 
 //----------------------------------------------- FSM Resets -----------------------------------------------------------------//
@@ -67,6 +66,7 @@ void APlayableCharacter::ResetState()
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
+	ClearAttackPausedTimer();
 }
 
 bool APlayableCharacter::CanAttack()
@@ -131,7 +131,10 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		//NewHeavyCombo()
+		if (bHeavyAttackPaused)
+		{
+			NewHeavyCombo();
+		}
 		HeavyAttack();
 	}
 }
@@ -139,15 +142,18 @@ void APlayableCharacter::SaveHeavyAttack()
 void APlayableCharacter::StartAttackPausedTimer()
 {
 	GetWorldTimerManager().SetTimer(AttackPauseHandle, this, &APlayableCharacter::HeavyAttackPaused, .8, true);
+	UE_LOG(LogTemp, Warning, TEXT("StartAttackPausedTimer"));
 }
 
 void APlayableCharacter::ClearAttackPausedTimer()
 {
 	GetWorldTimerManager().ClearTimer(AttackPauseHandle);
+	UE_LOG(LogTemp, Warning, TEXT("ClearAttackPausedTimer"));
 }
 
 void APlayableCharacter::HeavyAttackPaused()
 {
+	UE_LOG(LogTemp, Warning, TEXT("IHeavyAttackPaused"));
 	bHeavyAttackPaused = true;
 	OnAttackPausedEvent.Broadcast();
 }
@@ -175,7 +181,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
 	}
-	
+
 }
 
 void APlayableCharacter::LightAttack()
@@ -188,7 +194,7 @@ void APlayableCharacter::LightAttack()
 		PerformLightAttack(LightAttackIndex);
 
 	}
-	else 
+	else
 	{
 		//Air attack logic
 	}
@@ -206,7 +212,7 @@ void APlayableCharacter::InputLightAttack()
 	{
 		bLightAttackSaved = true;
 	}
-	else 
+	else
 	{
 		LightAttack();
 	}
@@ -225,11 +231,13 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 		//SoftLock()
 		PlayAnimMontage(CurrentMontage);
 		//SetTimerByEvent
+		StartAttackPausedTimer();
 		HeavyAttackIndex++;
 		if (HeavyAttackIndex >= HeavyAttackCombo.Num())
 		{
 			HeavyAttackIndex = 0;
 			//ClearTimer
+			ClearAttackPausedTimer();
 			bHeavyAttackPaused = false;
 		}
 	}
@@ -239,11 +247,26 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 	}
 }
 
+void APlayableCharacter::PerformHeavyCombo()
+{
+
+}
+void APlayableCharacter::NewHeavyCombo()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack };
+	if(!IsStateEqualToAny(MakeArray))
+	{
+		PerformHeavyCombo();
+	}
+}
+
+
 void APlayableCharacter::HeavyAttack()
 {
 	if (CanAttack())
 	{
 		//Clear Timer : Attack Paused
+		ClearAttackPausedTimer();
 		bHeavyAttackPaused = false;
 		ResetLightAttack();
 		PerformHeavyAttack(HeavyAttackIndex);
