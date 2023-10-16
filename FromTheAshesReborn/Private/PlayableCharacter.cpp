@@ -2,6 +2,7 @@
 
 
 #include "PlayableCharacter.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -75,6 +76,8 @@ bool APlayableCharacter::CanAttack()
 	return !GetCharacterMovement()->IsFalling() && !GetCharacterMovement()->IsFlying() && !IsStateEqualToAny(MakeArray);
 }
 
+//--------------------------------------------------------- PlayerInputComponent ---------------------------------------------------------------------//
+
 void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -104,7 +107,7 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
-//----------------------------------------------- Attack Saves -----------------------------------------------------------------//
+//---------------------------------------------------------- Attack Saves -----------------------------------------------------------------//
 
 void APlayableCharacter::SaveLightAttack()
 {
@@ -131,9 +134,10 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			SetState(EStates::EState_Nothing);
 		}
+		//Perform pause combo or regular
 		if (bHeavyAttackPaused)
 		{
-			NewHeavyCombo();
+			SelectHeavyCombo();
 		}
 		HeavyAttack();
 	}
@@ -142,18 +146,15 @@ void APlayableCharacter::SaveHeavyAttack()
 void APlayableCharacter::StartAttackPausedTimer()
 {
 	GetWorldTimerManager().SetTimer(AttackPauseHandle, this, &APlayableCharacter::HeavyAttackPaused, .8, true);
-	UE_LOG(LogTemp, Warning, TEXT("StartAttackPausedTimer"));
 }
 
 void APlayableCharacter::ClearAttackPausedTimer()
 {
 	GetWorldTimerManager().ClearTimer(AttackPauseHandle);
-	UE_LOG(LogTemp, Warning, TEXT("ClearAttackPausedTimer"));
 }
 
 void APlayableCharacter::HeavyAttackPaused()
 {
-	UE_LOG(LogTemp, Warning, TEXT("IHeavyAttackPaused"));
 	bHeavyAttackPaused = true;
 	OnAttackPausedEvent.Broadcast();
 }
@@ -220,35 +221,33 @@ void APlayableCharacter::InputLightAttack()
 
 //----------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
 
-void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
-{
-	UAnimMontage* CurrentMontage = HeavyAttackCombo[AttackIndex];
-	if (CurrentMontage)
-	{
-		//StopBuffer()
-		//Buffer()
-		SetState(EStates::EState_Attack);
-		//SoftLock()
-		PlayAnimMontage(CurrentMontage);
-		//SetTimerByEvent
-		StartAttackPausedTimer();
-		HeavyAttackIndex++;
-		if (HeavyAttackIndex >= HeavyAttackCombo.Num())
-		{
-			HeavyAttackIndex = 0;
-			//ClearTimer
-			ClearAttackPausedTimer();
-			bHeavyAttackPaused = false;
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
-	}
-}
 
 void APlayableCharacter::PerformHeavyCombo()
 {
+	UAnimMontage* AttackMontage = PausedHeavyAttackCombo[NewHeavyAttackIndex];
+	if (AttackMontage)
+	{
+		//StopBuffer();
+		//Buffer();
+		SetState(EStates::EState_Attack);
+		//SoftLock();
+		PlayAnimMontage(AttackMontage);
+		NewHeavyAttackIndex++;
+		if (NewHeavyAttackIndex >= PausedHeavyAttackCombo.Num())
+		{
+			NewHeavyAttackIndex = 0;
+			bHeavyAttackPaused = false;
+		}
+
+	}
+}
+
+//TODO: Select combo for scalability
+void APlayableCharacter::SelectHeavyCombo()
+{
+	//REFACTOR
+	PerformHeavyCombo();
+
 
 }
 void APlayableCharacter::NewHeavyCombo()
@@ -260,6 +259,30 @@ void APlayableCharacter::NewHeavyCombo()
 	}
 }
 
+void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
+{
+	UAnimMontage* CurrentMontage = HeavyAttackCombo[AttackIndex];
+	if (CurrentMontage)
+	{
+		//StopBuffer()
+		//Buffer()
+		SetState(EStates::EState_Attack);
+		//SoftLock()
+		PlayAnimMontage(CurrentMontage);
+		StartAttackPausedTimer();
+		HeavyAttackIndex++;
+		if (HeavyAttackIndex >= HeavyAttackCombo.Num())
+		{
+			HeavyAttackIndex = 0;
+			ClearAttackPausedTimer();
+			bHeavyAttackPaused = false;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
+	}
+}
 
 void APlayableCharacter::HeavyAttack()
 {

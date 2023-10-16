@@ -50,6 +50,7 @@ protected:
 	void HeavyAttack();
 	void NewHeavyCombo();
 	void PerformHeavyAttack(int HeavyAttackIndex);
+	void SelectHeavyCombo();
 	void PerformHeavyCombo();
 
 
@@ -95,6 +96,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> HeavyAttackCombo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
+	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo;
 
 	//Timers
 	FTimerHandle AttackPauseHandle;
