@@ -137,7 +137,7 @@ void APlayableCharacter::SaveHeavyAttack()
 		//Perform pause combo or regular
 		if (bHeavyAttackPaused)
 		{
-			SelectHeavyCombo();
+			NewHeavyCombo();
 		}
 		HeavyAttack();
 	}
@@ -222,7 +222,7 @@ void APlayableCharacter::InputLightAttack()
 //----------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
 
 
-void APlayableCharacter::PerformHeavyCombo()
+void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo)
 {
 	UAnimMontage* AttackMontage = PausedHeavyAttackCombo[NewHeavyAttackIndex];
 	if (AttackMontage)
@@ -238,15 +238,22 @@ void APlayableCharacter::PerformHeavyCombo()
 			NewHeavyAttackIndex = 0;
 			bHeavyAttackPaused = false;
 		}
-
 	}
 }
 
 //TODO: Select combo for scalability
 void APlayableCharacter::SelectHeavyCombo()
 {
-	//REFACTOR
-	PerformHeavyCombo();
+	//UE_LOG(LogTemp, Warning, TEXT("HeavyAttackIndex: %d"), NewHeavyAttackIndex);
+	if (HeavyAttackIndex == 1)
+	{
+		PerformHeavyCombo(PausedHeavyAttackCombo1);
+	}
+	if (HeavyAttackIndex == 2)
+	{
+		PerformHeavyCombo(PausedHeavyAttackCombo2);
+
+	}
 
 
 }
@@ -255,7 +262,7 @@ void APlayableCharacter::NewHeavyCombo()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if(!IsStateEqualToAny(MakeArray))
 	{
-		PerformHeavyCombo();
+		SelectHeavyCombo();
 	}
 }
 
