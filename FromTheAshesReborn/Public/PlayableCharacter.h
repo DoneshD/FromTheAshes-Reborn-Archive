@@ -48,10 +48,15 @@ protected:
 	//Heavy Attacks
 	void InputHeavyAttack();
 	void HeavyAttack();
-	void NewHeavyCombo();
 	void PerformHeavyAttack(int HeavyAttackIndex);
+
+	//Heavy Combos
 	void SelectHeavyCombo();
+	void NewHeavyCombo();
 	void PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
+
+	UFUNCTION()
+	void HeavyAttackPaused();
 
 
 	// Save Attacks
@@ -65,12 +70,16 @@ protected:
 	void StartAttackPausedTimer();
 	void ClearAttackPausedTimer();
 
-	UFUNCTION()
-	void HeavyAttackPaused();
-
-
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void EnableRootRotation();
 
 private:
+
+	//Lock Ons
+	bool bTargeting = false;
+
+	TObjectPtr<AActor> HardTarget;
+	TObjectPtr<AActor> SoftTarget;
 
 	//Dodge logic
 	bool bDodgeSaved;
@@ -102,6 +111,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
+
+
 
 	//Timers
 	FTimerHandle AttackPauseHandle;

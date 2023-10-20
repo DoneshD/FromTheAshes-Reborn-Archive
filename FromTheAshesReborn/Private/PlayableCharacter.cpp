@@ -107,6 +107,16 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
+//---------------------------------------------------------- Movement -----------------------------------------------------------------//
+
+void APlayableCharacter::EnableRootRotation()
+{
+	if (!SoftTarget && !HardTarget)
+	{
+		GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
+	}
+}
+
 //---------------------------------------------------------- Attack Saves -----------------------------------------------------------------//
 
 void APlayableCharacter::SaveLightAttack()
