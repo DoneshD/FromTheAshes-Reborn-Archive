@@ -87,7 +87,25 @@ bool APlayableCharacter::CanAttack()
 void APlayableCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (bTargeting && HardTarget)
+	{
+		if (GetDistanceTo(HardTarget) < 2000.f)
+		{
+			if (GetCharacterMovement()->IsFalling() || GetCharacterMovement()->IsFlying())
+			{
+				FVector ResultVectorAVector(0, 0, 80.f);
+			}
+			FVector ResultVector(0, 0, 30.f);
+			FVector TargetLocation = GetActorLocation() - HardTarget->GetActorLocation() - ResultVector;
+			FRotator TargetRotation = FRotationMatrix::MakeFromX(TargetLocation).Rotator();
+			GetController()->SetControlRotation();
+		}
+		else
+		{
+			bTargeting = false;
+			HardTarget = NULL;
+		}
+	}
 }
 
 //--------------------------------------------------------- PlayerInputComponent ---------------------------------------------------------------------//
@@ -219,6 +237,7 @@ void APlayableCharacter::HardLockOn()
 				AActor* HitActor = OutHit.GetActor();
 				if (HitActor)
 				{
+					bTargeting = true;
 					HardTarget = HitActor;
 				}
 			}
