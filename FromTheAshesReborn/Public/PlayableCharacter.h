@@ -20,13 +20,19 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 
 	
 protected:
+	//Constructor
 	APlayableCharacter();
 
+
+	//Inputs
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LightAttack;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_HeavyAttack;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_LockOn;
 
 	//FSM Reset States
 	UFUNCTION(BlueprintCallable, Category = "FSM")
@@ -77,7 +83,10 @@ protected:
 	void EnableRootRotation();
 
 	//LockOn
+	void RotationToTarget();
 	void SoftLockOn();
+
+	void HardLockOn();
 
 private:
 
@@ -86,6 +95,7 @@ private:
 
 	TObjectPtr<AActor> HardTarget;
 	TObjectPtr<AActor> SoftTarget;
+	TObjectPtr<UCameraComponent> CameraComp;
 
 	//Dodge logic
 	bool bDodgeSaved;
@@ -106,6 +116,15 @@ private:
 	int AirComboIndex;
 	bool bLaunched;
 
+	//Timers
+	FTimerHandle AttackPauseHandle;
+	FOnAttackPausedEvent OnAttackPausedEvent;
+
+	//Timelines
+	
+	//Execution
+	bool bExecuting;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
 
@@ -117,15 +136,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
-
-
-
-	//Timers
-	FTimerHandle AttackPauseHandle;
-	FOnAttackPausedEvent OnAttackPausedEvent;
-
-	bool bExecuting;
-
 	
 
 public:

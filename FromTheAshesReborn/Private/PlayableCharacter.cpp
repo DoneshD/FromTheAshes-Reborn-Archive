@@ -3,6 +3,7 @@
 
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "FTACharacter.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -106,6 +107,7 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputLightAttack);
 		InputComp->BindAction(Input_HeavyAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputHeavyAttack);
+		InputComp->BindAction(Input_LockOn, ETriggerEvent::Started, this, &APlayableCharacter::HardLockOn);
 
 	}
 }
@@ -122,11 +124,19 @@ void APlayableCharacter::EnableRootRotation()
 
 //------------------------------------------------------------- LockOn -----------------------------------------------------------------//
 
+void APlayableCharacter::RotationToTarget()
+{
+	if (SoftTarget)
+	{
+
+	}
+}
+
 void APlayableCharacter::SoftLockOn()
 {
 	if (!bTargeting && !HardTarget)
 	{
-		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * 500.f) + GetActorLocation();
+		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * 250) + GetActorLocation();
 		FHitResult OutHit;
 
 		TArray<AActor*> ActorArray;
@@ -143,9 +153,10 @@ void APlayableCharacter::SoftLockOn()
 			ObjectTypes, 
 			false, 
 			ActorArray, 
-			EDrawDebugTrace::ForDuration, 
+			EDrawDebugTrace::None, 
 			OutHit, 
 			true);
+
 		if (TargetHit)
 		{
 			AActor* HitActor = OutHit.GetActor();
@@ -154,7 +165,51 @@ void APlayableCharacter::SoftLockOn()
 				SoftTarget = HitActor;
 			}
 		}
+		else
+		{
+			SoftTarget = NULL;
+		}
 		
+	}
+}
+
+void APlayableCharacter::HardLockOn()
+{
+	if (!bTargeting && !HardTarget)
+	{
+		//bSprinting = false;
+		//GetCharacterMovement()->MaxWalkSpeed = 600.f;
+
+		FTACharacter* FTACharacter;
+		APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(FTACharacter);
+		UCameraComponent* Camera = PlayerCharacter->CameraComp;
+		//FVector CameraVector = CameraComp->GetForwardVector();
+		//FVector EndLocation = () + GetActorLocation();
+		FHitResult OutHit;
+
+		TArray<AActor*> ActorArray;
+		ActorArray.Add(this);
+
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+		bool TargetHit = UKismetSystemLibrary::SphereTraceSingleForObjects(
+			GetWorld(),
+			GetActorLocation(),
+			EndLocation,
+			100.f,
+			ObjectTypes,
+			false,
+			ActorArray,
+			EDrawDebugTrace::None,
+			OutHit,
+			true);
+
+	}
+	else
+	{
+		bTargeting = false;
+		HardTarget = NULL;
 	}
 }
 
