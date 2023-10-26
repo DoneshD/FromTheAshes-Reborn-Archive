@@ -69,9 +69,15 @@ protected:
 	//Timed Attacks
 	void StartAttackPausedTimer();
 	void ClearAttackPausedTimer();
+	
 
+
+	//Movement
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void EnableRootRotation();
+
+	//LockOn
+	void SoftLockOn();
 
 private:
 

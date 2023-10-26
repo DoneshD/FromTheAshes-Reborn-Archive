@@ -2,6 +2,7 @@
 
 
 #include "PlayableCharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -23,7 +24,7 @@ APlayableCharacter::APlayableCharacter()
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 }
 
-//----------------------------------------------- FSM Resets -----------------------------------------------------------------//
+//-------------------------------------------------- FSM Resets -----------------------------------------------------------------//
 
 void APlayableCharacter::ResetLightAttack()
 {
@@ -63,11 +64,13 @@ void APlayableCharacter::ResetState()
 	}
 
 	SetState(EStates::EState_Nothing);
+	SoftTarget = NULL;
 
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ClearAttackPausedTimer();
+
 }
 
 bool APlayableCharacter::CanAttack()
@@ -107,13 +110,51 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
-//---------------------------------------------------------- Movement -----------------------------------------------------------------//
+//------------------------------------------------------------ Movement -----------------------------------------------------------------//
 
 void APlayableCharacter::EnableRootRotation()
 {
 	if (!SoftTarget && !HardTarget)
 	{
 		GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
+	}
+}
+
+//------------------------------------------------------------- LockOn -----------------------------------------------------------------//
+
+void APlayableCharacter::SoftLockOn()
+{
+	if (!bTargeting && !HardTarget)
+	{
+		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * 500.f) + GetActorLocation();
+		FHitResult OutHit;
+
+		TArray<AActor*> ActorArray;
+		ActorArray.Add(this);
+		
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+		bool TargetHit = UKismetSystemLibrary::SphereTraceSingleForObjects(
+			GetWorld(), 
+			GetActorLocation(), 
+			EndLocation, 
+			100.f, 
+			ObjectTypes, 
+			false, 
+			ActorArray, 
+			EDrawDebugTrace::ForDuration, 
+			OutHit, 
+			true);
+		if (TargetHit)
+		{
+			AActor* HitActor = OutHit.GetActor();
+			if (HitActor)
+			{
+				SoftTarget = HitActor;
+			}
+		}
+		
 	}
 }
 
@@ -170,7 +211,7 @@ void APlayableCharacter::HeavyAttackPaused()
 }
 
 
-//----------------------------------------------- Light Attack Actions -----------------------------------------------------------------//
+//------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
 
 void APlayableCharacter::PerformLightAttack(int AttackIndex)
 {
@@ -180,7 +221,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 		//StopBuffer()
 		//Buffer()
 		SetState(EStates::EState_Attack);
-		//SoftLock()
+		SoftLockOn();
 		PlayAnimMontage(CurrentMontage);
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
@@ -229,7 +270,7 @@ void APlayableCharacter::InputLightAttack()
 	}
 }
 
-//----------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
+//--------------------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
 
 
 void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo)
