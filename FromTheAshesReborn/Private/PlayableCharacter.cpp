@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
+//------------------------------------------------------------- Constructor -----------------------------------------------------------------//
+
 APlayableCharacter::APlayableCharacter()
 {
 	//Jump and Air Control
@@ -25,7 +27,7 @@ APlayableCharacter::APlayableCharacter()
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 }
 
-//-------------------------------------------------- FSM Resets -----------------------------------------------------------------//
+//------------------------------------------------------------- FSM Resets -----------------------------------------------------------------//
 
 void APlayableCharacter::ResetLightAttack()
 {
@@ -78,6 +80,14 @@ bool APlayableCharacter::CanAttack()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Execution };
 	return !GetCharacterMovement()->IsFalling() && !GetCharacterMovement()->IsFlying() && !IsStateEqualToAny(MakeArray);
+}
+
+//------------------------------------------------------------- Tick -----------------------------------------------------------------//
+
+void APlayableCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }
 
 //--------------------------------------------------------- PlayerInputComponent ---------------------------------------------------------------------//
