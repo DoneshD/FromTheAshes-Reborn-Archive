@@ -3,7 +3,7 @@
 
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "FTACharacter.h"
+#include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -180,36 +180,45 @@ void APlayableCharacter::HardLockOn()
 		//bSprinting = false;
 		//GetCharacterMovement()->MaxWalkSpeed = 600.f;
 
-		FTACharacter* FTACharacter;
-		APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(FTACharacter);
-		UCameraComponent* Camera = PlayerCharacter->CameraComp;
-		//FVector CameraVector = CameraComp->GetForwardVector();
-		//FVector EndLocation = () + GetActorLocation();
-		FHitResult OutHit;
+		if (UCameraComponent* FollowCamera = this->CameraComp)
+		{
+			FVector CameraVector = FollowCamera->GetForwardVector();
+			FVector EndLocation = (CameraVector * 2000.f) + GetActorLocation();
+			FHitResult OutHit;
 
-		TArray<AActor*> ActorArray;
-		ActorArray.Add(this);
+			TArray<AActor*> ActorArray;
+			ActorArray.Add(this);
 
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-		bool TargetHit = UKismetSystemLibrary::SphereTraceSingleForObjects(
-			GetWorld(),
-			GetActorLocation(),
-			EndLocation,
-			100.f,
-			ObjectTypes,
-			false,
-			ActorArray,
-			EDrawDebugTrace::None,
-			OutHit,
-			true);
+			bool TargetHit = UKismetSystemLibrary::SphereTraceSingleForObjects(
+				GetWorld(),
+				GetActorLocation(),
+				EndLocation,
+				100.f,
+				ObjectTypes,
+				false,
+				ActorArray,
+				EDrawDebugTrace::ForDuration,
+				OutHit,
+				true);
 
+			if (TargetHit)
+			{
+				AActor* HitActor = OutHit.GetActor();
+				if (HitActor)
+				{
+					HardTarget = HitActor;
+				}
+			}
+		}
 	}
 	else
 	{
 		bTargeting = false;
 		HardTarget = NULL;
+
 	}
 }
 

@@ -23,6 +23,9 @@ protected:
 	//Constructor
 	APlayableCharacter();
 
+	//Casts
+	TObjectPtr<AFTACharacter> FTACharacter;
+
 
 	//Inputs
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -95,7 +98,6 @@ private:
 
 	TObjectPtr<AActor> HardTarget;
 	TObjectPtr<AActor> SoftTarget;
-	TObjectPtr<UCameraComponent> CameraComp;
 
 	//Dodge logic
 	bool bDodgeSaved;
