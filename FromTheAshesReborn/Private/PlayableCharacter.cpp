@@ -3,6 +3,7 @@
 
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 
@@ -113,7 +114,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 	if (bActiveCollision)
 	{
-		TArray<FHitResult> OutHit;
+		TArray<FHitResult> OutHits;
 		FVector StartLocation = GetMesh()->GetSocketLocation("Start_R");
 		FVector EndLocation = GetMesh()->GetSocketLocation("Start_R");
 
@@ -132,8 +133,25 @@ void APlayableCharacter::Tick(float DeltaTime)
 			false,
 			ActorArray,
 			EDrawDebugTrace::ForDuration,
-			OutHit,
+			OutHits,
 			true);
+
+		//Use INTERFACE
+		for (auto& CurrentHit : OutHits)
+		{
+			if (CurrentHit.GetActor())
+			{
+				HitActor = CurrentHit.GetActor();
+			}
+			if (!AlreadyHitActors.Contains(CurrentHit.GetActor()))
+			{
+				AlreadyHitActors.AddUnique(HitActor);
+				//TODO: Apply Damage
+				//UGameplayStatics::ApplyDamage()
+			}
+		}
+
+		
 	}
 }
 
@@ -216,10 +234,10 @@ void APlayableCharacter::SoftLockOn()
 
 		if (TargetHit)
 		{
-			AActor* HitActor = OutHit.GetActor();
+			AActor* SoftActor = OutHit.GetActor();
 			if (HitActor)
 			{
-				SoftTarget = HitActor;
+				SoftTarget = SoftActor;
 			}
 		}
 		else
@@ -261,11 +279,11 @@ void APlayableCharacter::HardLockOn()
 
 			if (TargetHit)
 			{
-				AActor* HitActor = OutHit.GetActor();
+				AActor* HardActor = OutHit.GetActor();
 				if (HitActor)
 				{
 					bTargeting = true;
-					HardTarget = HitActor;
+					HardTarget = HardActor;
 				}
 			}
 		}

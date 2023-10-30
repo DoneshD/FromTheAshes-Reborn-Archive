@@ -125,6 +125,7 @@ private:
 
 	//Weapon Collision
 	bool bActiveCollision = false;
+	TObjectPtr<AActor> HitActor;
 	TArray<TObjectPtr<AActor>> AlreadyHitActors;
 
 	//Timers
