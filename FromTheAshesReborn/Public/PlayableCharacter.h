@@ -72,14 +72,19 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Light Attack")
 	void SaveLightAttack();
 
-	UFUNCTION(BlueprintCallable, Category = "Light Attack")
+	UFUNCTION(BlueprintCallable, Category = "Heavy Attack")
 	void SaveHeavyAttack();
 
 	//Timed Attacks
 	void StartAttackPausedTimer();
 	void ClearAttackPausedTimer();
 	
+	//Weapon Collision
+	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
+	void StartWeaponCollision();
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
+	void EndWeaponCollision();
 
 	//Movement
 	UFUNCTION(BlueprintCallable, Category = "Movement")
@@ -117,6 +122,10 @@ private:
 	//Air attack
 	int AirComboIndex;
 	bool bLaunched;
+
+	//Weapon Collision
+	bool bActiveCollision = false;
+	TArray<TObjectPtr<AActor>> AlreadyHitActors;
 
 	//Timers
 	FTimerHandle AttackPauseHandle;

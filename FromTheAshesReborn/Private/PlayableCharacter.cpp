@@ -4,7 +4,6 @@
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Math/UnrealMathUtility.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"
@@ -100,7 +99,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 			FVector ResultVector(0, 0, 30.f);
 			FVector TargetLocation = HardTarget->GetActorLocation() - ResultVector;
-			//FRotator TargetRotation = FRotationMatrix::MakeFromX(TargetLocation).Rotator();
 			FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
 			FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.f);
 
@@ -111,6 +109,31 @@ void APlayableCharacter::Tick(float DeltaTime)
 			bTargeting = false;
 			HardTarget = NULL;
 		}
+	}
+
+	if (bActiveCollision)
+	{
+		TArray<FHitResult> OutHit;
+		FVector StartLocation = GetMesh()->GetSocketLocation("Start_R");
+		FVector EndLocation = GetMesh()->GetSocketLocation("Start_R");
+
+		TArray<AActor*> ActorArray;
+		ActorArray.Add(this);
+
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+		bool TargetHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+			GetWorld(),
+			GetActorLocation(),
+			EndLocation,
+			20.f,
+			ObjectTypes,
+			false,
+			ActorArray,
+			EDrawDebugTrace::ForDuration,
+			OutHit,
+			true);
 	}
 }
 
@@ -162,7 +185,7 @@ void APlayableCharacter::RotationToTarget()
 {
 	if (SoftTarget)
 	{
-
+		//TODO
 	}
 }
 
@@ -211,8 +234,6 @@ void APlayableCharacter::HardLockOn()
 {
 	if (!bTargeting && !HardTarget)
 	{
-		//bSprinting = false;
-		//GetCharacterMovement()->MaxWalkSpeed = 600.f;
 
 		if (UCameraComponent* FollowCamera = this->CameraComp)
 		{
@@ -474,4 +495,18 @@ void APlayableCharacter::InputHeavyAttack()
 	{
 		HeavyAttack();
 	}
+}
+
+
+//------------------------------------------------------------ Weapon Collisions -----------------------------------------------------------------//
+
+void APlayableCharacter::StartWeaponCollision()
+{
+	AlreadyHitActors.Empty();
+	bActiveCollision = true;
+}
+void APlayableCharacter::EndWeaponCollision()
+{
+	bActiveCollision = false;
+
 }
