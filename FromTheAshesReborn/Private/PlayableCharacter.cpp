@@ -3,6 +3,8 @@
 
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"
@@ -95,10 +97,14 @@ void APlayableCharacter::Tick(float DeltaTime)
 			{
 				FVector ResultVectorAVector(0, 0, 80.f);
 			}
+
 			FVector ResultVector(0, 0, 30.f);
-			FVector TargetLocation = GetActorLocation() - HardTarget->GetActorLocation() - ResultVector;
-			FRotator TargetRotation = FRotationMatrix::MakeFromX(TargetLocation).Rotator();
-			GetController()->SetControlRotation();
+			FVector TargetLocation = HardTarget->GetActorLocation() - ResultVector;
+			//FRotator TargetRotation = FRotationMatrix::MakeFromX(TargetLocation).Rotator();
+			FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
+			FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.f);
+
+			GetController()->SetControlRotation(InterpRot);
 		}
 		else
 		{

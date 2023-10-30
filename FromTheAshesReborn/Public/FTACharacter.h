@@ -64,13 +64,12 @@ protected:
 	void SetState(EStates NewState);
 	bool IsStateEqualToAny(TArray<EStates> StatesToCheck);
 
-private:
-
 public:
 	AFTACharacter();
 
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 	EStates CurrentState;
 };
