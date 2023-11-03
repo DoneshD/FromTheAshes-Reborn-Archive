@@ -26,7 +26,6 @@ protected:
 	//Casts
 	TObjectPtr<AFTACharacter> FTACharacter;
 
-
 	//Inputs
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LightAttack;
@@ -35,19 +34,27 @@ protected:
 	TObjectPtr<UInputAction> Input_HeavyAttack;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_Dodge;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LockOn;
 
 	//FSM Reset States
 	UFUNCTION(BlueprintCallable, Category = "FSM")
 	void ResetState();
-
 	void ResetLightAttack();
 	void ResetHeavyAttack();
 	void ResetAirAttack();
 	void ResetDodge();
 
+
 	//FSM Attack Check
 	bool CanAttack();
+	bool CanDodge();
+
+	//Dodge
+	void Dodge();
+	void PerformDodge();
 
 	//Light Attacks
 	void InputLightAttack();
@@ -66,7 +73,6 @@ protected:
 
 	UFUNCTION()
 	void HeavyAttackPaused();
-
 
 	// Save Attacks
 	UFUNCTION(BlueprintCallable, Category = "Light Attack")
@@ -93,7 +99,6 @@ protected:
 	//LockOn
 	void RotationToTarget();
 	void SoftLockOn();
-
 	void HardLockOn();
 
 private:
@@ -107,7 +112,7 @@ private:
 	//Dodge logic
 	bool bDodgeSaved;
 	bool bCanRoll;
-	bool bCanDodge;
+	bool bCanDodge = true;
 
 	//Light Attack
 	int LightAttackIndex = 0;
@@ -151,6 +156,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TArray<TObjectPtr<UAnimMontage>> DodgeArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Roll Anim")
+	TArray<TObjectPtr<UAnimMontage>> RollArray;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

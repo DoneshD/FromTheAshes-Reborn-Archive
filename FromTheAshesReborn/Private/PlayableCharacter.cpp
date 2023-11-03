@@ -85,6 +85,12 @@ bool APlayableCharacter::CanAttack()
 	return !GetCharacterMovement()->IsFalling() && !GetCharacterMovement()->IsFlying() && !IsStateEqualToAny(MakeArray);
 }
 
+bool APlayableCharacter::CanDodge()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Dodge, EStates::EState_Execution };
+	return !GetCharacterMovement()->IsFalling() && bCanDodge && !IsStateEqualToAny(MakeArray);
+}
+
 //------------------------------------------------------------- Tick -----------------------------------------------------------------//
 
 void APlayableCharacter::Tick(float DeltaTime)
@@ -131,7 +137,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 		bool bLeftHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
 			GetWorld(),
-			//CHANGE TO WEAPON SOCKET!!!
 			StartLocation_L,
 			EndLocation_L,
 			20.f,
@@ -144,7 +149,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 		bool bRighttHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
 			GetWorld(),
-			//CHANGE TO WEAPON SOCKET!!!
 			StartLocation_R,
 			EndLocation_R,
 			20.f,
@@ -213,8 +217,8 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputLightAttack);
 		InputComp->BindAction(Input_HeavyAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputHeavyAttack);
+		InputComp->BindAction(Input_Dodge, ETriggerEvent::Started, this, &APlayableCharacter::Dodge);
 		InputComp->BindAction(Input_LockOn, ETriggerEvent::Started, this, &APlayableCharacter::HardLockOn);
-
 	}
 }
 
@@ -225,6 +229,28 @@ void APlayableCharacter::EnableRootRotation()
 	if (!SoftTarget && !HardTarget)
 	{
 		GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
+	}
+}
+
+void APlayableCharacter::PerformDodge()
+{
+	//StopRotation01()
+	//StopRotation02()
+	SoftTarget = NULL;
+	//StopBuffer()
+	//Buffer()
+	PlayAnimMontage(DodgeArray[0]);
+}
+
+void APlayableCharacter::Dodge()
+{
+	if (CanDodge())
+	{
+		PerformDodge();
+	}
+	else
+	{
+		bDodgeSaved = true;
 	}
 }
 
