@@ -55,14 +55,20 @@ protected:
 	//Dodge
 	void Dodge();
 	void PerformDodge();
+
 	UFUNCTION(BlueprintCallable, Category = "Dodge")
 	void SaveDodge();
+
+	UFUNCTION(BlueprintCallable, Category = "Dodge")
+	void EnableRoll();
+
+	UFUNCTION(BlueprintCallable, Category = "Dodge")
+	void DisableRoll();
 
 	//Light Attacks
 	void InputLightAttack();
 	void LightAttack();
 	void PerformLightAttack(int LightAttackIndex);
-	// Save Attack
 	UFUNCTION(BlueprintCallable, Category = "Light Attack")
 	void SaveLightAttack();
 
@@ -70,7 +76,6 @@ protected:
 	void InputHeavyAttack();
 	void HeavyAttack();
 	void PerformHeavyAttack(int HeavyAttackIndex);
-	//Save Attack
 	UFUNCTION(BlueprintCallable, Category = "Heavy Attack")
 	void SaveHeavyAttack();
 

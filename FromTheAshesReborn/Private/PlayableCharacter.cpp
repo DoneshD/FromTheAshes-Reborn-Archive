@@ -237,6 +237,16 @@ void APlayableCharacter::EnableRootRotation()
 
 //------------------------------------------------------------ Dodge -----------------------------------------------------------------//
 
+void APlayableCharacter::EnableRoll()
+{
+	bCanRoll = true;
+}
+
+void APlayableCharacter::DisableRoll()
+{
+	bCanRoll = false;
+}
+
 void APlayableCharacter::SaveDodge()
 {
 	if (bDodgeSaved)
@@ -263,7 +273,19 @@ void APlayableCharacter::PerformDodge()
 	//{
 	//	DodgeSystem();
 	//}
-	PlayAnimMontage(DodgeArray[0]);
+	if (bTargeting)
+	{
+
+	}
+	else
+	{
+		PlayAnimMontage(DodgeArray[0]);
+	}
+	if (bCanRoll)
+	{
+		PlayAnimMontage(RollArray[0]);
+		UE_LOG(LogTemp, Warning, TEXT("Here"));
+	}
 	SetState(EStates::EState_Dodge);
 }
 
