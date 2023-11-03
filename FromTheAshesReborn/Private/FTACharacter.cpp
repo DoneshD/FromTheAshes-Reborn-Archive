@@ -151,6 +151,7 @@ void AFTACharacter::Move(const FInputActionInstance& Instance)
 	ControlRot.Roll = 0.0f;
 
 	const FVector2D AxisValue = Instance.GetValue().Get<FVector2D>();
+	InputDirection = AxisValue;
 
 	// Move forward/back
 	AddMovementInput(ControlRot.Vector(), AxisValue.Y);

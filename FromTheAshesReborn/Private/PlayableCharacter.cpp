@@ -121,6 +121,8 @@ void APlayableCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	//------------------------------------------------------------ TICK::Weapon Collisions -----------------------------------------------------------------//
+
 	if (bActiveCollision)
 	{
 		TArray<FHitResult> LeftHits;
@@ -234,7 +236,6 @@ void APlayableCharacter::EnableRootRotation()
 	}
 }
 
-
 //------------------------------------------------------------ Dodge -----------------------------------------------------------------//
 
 void APlayableCharacter::EnableRoll()
@@ -269,13 +270,11 @@ void APlayableCharacter::PerformDodge()
 	SoftTarget = NULL;
 	//StopBuffer()
 	//Buffer()
-	//if (bTargeting)
-	//{
-	//	DodgeSystem();
-	//}
 	if (bTargeting)
 	{
-
+		FVector2D FloatValue = InputDirection;
+		UE_LOG(LogTemp, Warning, TEXT("Float Value X: %f, Y: %f"), FloatValue.X, FloatValue.Y);
+		//DodgeSystem();
 	}
 	else
 	{
@@ -284,7 +283,6 @@ void APlayableCharacter::PerformDodge()
 	if (bCanRoll)
 	{
 		PlayAnimMontage(RollArray[0]);
-		UE_LOG(LogTemp, Warning, TEXT("Here"));
 	}
 	SetState(EStates::EState_Dodge);
 }
@@ -474,7 +472,6 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
 	}
-
 }
 
 void APlayableCharacter::LightAttack()
@@ -485,7 +482,6 @@ void APlayableCharacter::LightAttack()
 		//DodgeAttacks() SHOULD REFACTOR
 		ResetHeavyAttack();
 		PerformLightAttack(LightAttackIndex);
-
 	}
 	else
 	{
@@ -512,7 +508,6 @@ void APlayableCharacter::InputLightAttack()
 }
 
 //--------------------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
-
 
 void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo)
 {
@@ -544,10 +539,7 @@ void APlayableCharacter::SelectHeavyCombo()
 	if (HeavyAttackIndex == 2)
 	{
 		PerformHeavyCombo(PausedHeavyAttackCombo2);
-
 	}
-
-
 }
 void APlayableCharacter::NewHeavyCombo()
 {
@@ -592,7 +584,6 @@ void APlayableCharacter::HeavyAttack()
 		bHeavyAttackPaused = false;
 		ResetLightAttack();
 		PerformHeavyAttack(HeavyAttackIndex);
-
 	}
 	else
 	{
@@ -617,7 +608,6 @@ void APlayableCharacter::InputHeavyAttack()
 		HeavyAttack();
 	}
 }
-
 
 //------------------------------------------------------------ Weapon Collisions -----------------------------------------------------------------//
 
