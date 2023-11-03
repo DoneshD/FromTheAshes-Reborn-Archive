@@ -55,16 +55,24 @@ protected:
 	//Dodge
 	void Dodge();
 	void PerformDodge();
+	UFUNCTION(BlueprintCallable, Category = "Dodge")
+	void SaveDodge();
 
 	//Light Attacks
 	void InputLightAttack();
 	void LightAttack();
 	void PerformLightAttack(int LightAttackIndex);
+	// Save Attack
+	UFUNCTION(BlueprintCallable, Category = "Light Attack")
+	void SaveLightAttack();
 
 	//Heavy Attacks
 	void InputHeavyAttack();
 	void HeavyAttack();
 	void PerformHeavyAttack(int HeavyAttackIndex);
+	//Save Attack
+	UFUNCTION(BlueprintCallable, Category = "Heavy Attack")
+	void SaveHeavyAttack();
 
 	//Heavy Combos
 	void SelectHeavyCombo();
@@ -73,13 +81,6 @@ protected:
 
 	UFUNCTION()
 	void HeavyAttackPaused();
-
-	// Save Attacks
-	UFUNCTION(BlueprintCallable, Category = "Light Attack")
-	void SaveLightAttack();
-
-	UFUNCTION(BlueprintCallable, Category = "Heavy Attack")
-	void SaveHeavyAttack();
 
 	//Timed Attacks
 	void StartAttackPausedTimer();

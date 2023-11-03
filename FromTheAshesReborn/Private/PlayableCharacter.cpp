@@ -71,6 +71,8 @@ void APlayableCharacter::ResetState()
 	SetState(EStates::EState_Nothing);
 	HardTarget = NULL;
 	SoftTarget = NULL;
+	bCanDodge = true;
+	bDodgeSaved = false;
 
 	ResetLightAttack();
 	ResetHeavyAttack();
@@ -232,6 +234,24 @@ void APlayableCharacter::EnableRootRotation()
 	}
 }
 
+
+//------------------------------------------------------------ Dodge -----------------------------------------------------------------//
+
+void APlayableCharacter::SaveDodge()
+{
+	if (bDodgeSaved)
+	{
+		bDodgeSaved = false;
+		TArray<EStates> MakeArray = { EStates::EState_Dodge };
+		//IDK if this is right
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Dodge);
+		}
+		PerformDodge();
+	}
+}
+
 void APlayableCharacter::PerformDodge()
 {
 	//StopRotation01()
@@ -239,7 +259,12 @@ void APlayableCharacter::PerformDodge()
 	SoftTarget = NULL;
 	//StopBuffer()
 	//Buffer()
+	//if (bTargeting)
+	//{
+	//	DodgeSystem();
+	//}
 	PlayAnimMontage(DodgeArray[0]);
+	SetState(EStates::EState_Dodge);
 }
 
 void APlayableCharacter::Dodge()
