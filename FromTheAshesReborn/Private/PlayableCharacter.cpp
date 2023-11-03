@@ -69,16 +69,15 @@ void APlayableCharacter::ResetState()
 	}
 
 	SetState(EStates::EState_Nothing);
-	HardTarget = NULL;
 	SoftTarget = NULL;
 	bCanDodge = true;
 	bDodgeSaved = false;
+	bCanRoll = false;
 
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ClearAttackPausedTimer();
-
 }
 
 bool APlayableCharacter::CanAttack()
@@ -248,6 +247,13 @@ void APlayableCharacter::DisableRoll()
 	bCanRoll = false;
 }
 
+void APlayableCharacter::DodgeSystem(float X, float Y)
+{
+	UE_LOG(LogTemp, Warning, TEXT("System"));
+	UE_LOG(LogTemp, Warning, TEXT("Float Value X: %f, Y: %f"), X, Y);
+	PlayAnimMontage(DodgeArray[0]);
+}
+
 void APlayableCharacter::SaveDodge()
 {
 	if (bDodgeSaved)
@@ -255,7 +261,7 @@ void APlayableCharacter::SaveDodge()
 		bDodgeSaved = false;
 		TArray<EStates> MakeArray = { EStates::EState_Dodge };
 		//IDK if this is right
-		if (IsStateEqualToAny(MakeArray))
+		if (!IsStateEqualToAny(MakeArray))
 		{
 			SetState(EStates::EState_Dodge);
 		}
@@ -265,16 +271,17 @@ void APlayableCharacter::SaveDodge()
 
 void APlayableCharacter::PerformDodge()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Start"));
+
 	//StopRotation01()
 	//StopRotation02()
 	SoftTarget = NULL;
 	//StopBuffer()
 	//Buffer()
+
 	if (bTargeting)
 	{
-		FVector2D FloatValue = InputDirection;
-		UE_LOG(LogTemp, Warning, TEXT("Float Value X: %f, Y: %f"), FloatValue.X, FloatValue.Y);
-		//DodgeSystem();
+		DodgeSystem(InputDirection.X, InputDirection.Y);
 	}
 	else
 	{
@@ -283,8 +290,12 @@ void APlayableCharacter::PerformDodge()
 	if (bCanRoll)
 	{
 		PlayAnimMontage(RollArray[0]);
+		SetState(EStates::EState_Dodge);
 	}
-	SetState(EStates::EState_Dodge);
+	else
+	{
+		SetState(EStates::EState_Dodge);
+	}
 }
 
 void APlayableCharacter::Dodge()

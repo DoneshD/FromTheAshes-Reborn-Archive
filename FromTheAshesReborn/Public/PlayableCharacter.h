@@ -55,6 +55,7 @@ protected:
 	//Dodge
 	void Dodge();
 	void PerformDodge();
+	void DodgeSystem(float X, float Y);
 
 	UFUNCTION(BlueprintCallable, Category = "Dodge")
 	void SaveDodge();
