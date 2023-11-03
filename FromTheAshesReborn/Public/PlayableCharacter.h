@@ -125,8 +125,10 @@ private:
 
 	//Weapon Collision
 	bool bActiveCollision = false;
-	TObjectPtr<AActor> HitActor;
-	TArray<TObjectPtr<AActor>> AlreadyHitActors;
+	TObjectPtr<AActor> WCHitActor;
+	TArray<TObjectPtr<AActor>> AlreadyHitActors_L;
+	TArray<TObjectPtr<AActor>> AlreadyHitActors_R;
+
 
 	//Timers
 	FTimerHandle AttackPauseHandle;

@@ -69,6 +69,7 @@ void APlayableCharacter::ResetState()
 	}
 
 	SetState(EStates::EState_Nothing);
+	HardTarget = NULL;
 	SoftTarget = NULL;
 
 	ResetLightAttack();
@@ -114,9 +115,13 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 	if (bActiveCollision)
 	{
-		TArray<FHitResult> OutHits;
-		FVector StartLocation = GetMesh()->GetSocketLocation("Start_R");
-		FVector EndLocation = GetMesh()->GetSocketLocation("Start_R");
+		TArray<FHitResult> LeftHits;
+		FVector StartLocation_L = GetMesh()->GetSocketLocation("Start_L");
+		FVector EndLocation_L = GetMesh()->GetSocketLocation("End_L");
+
+		TArray<FHitResult> RightHits;
+		FVector StartLocation_R = GetMesh()->GetSocketLocation("Start_R");
+		FVector EndLocation_R = GetMesh()->GetSocketLocation("End_R");
 
 		TArray<AActor*> ActorArray;
 		ActorArray.Add(this);
@@ -124,34 +129,60 @@ void APlayableCharacter::Tick(float DeltaTime)
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-		bool TargetHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		bool bLeftHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
 			GetWorld(),
-			GetActorLocation(),
-			EndLocation,
+			//CHANGE TO WEAPON SOCKET!!!
+			StartLocation_L,
+			EndLocation_L,
 			20.f,
 			ObjectTypes,
 			false,
 			ActorArray,
 			EDrawDebugTrace::ForDuration,
-			OutHits,
+			LeftHits,
+			true);
+
+		bool bRighttHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+			GetWorld(),
+			//CHANGE TO WEAPON SOCKET!!!
+			StartLocation_R,
+			EndLocation_R,
+			20.f,
+			ObjectTypes,
+			false,
+			ActorArray,
+			EDrawDebugTrace::ForDuration,
+			RightHits,
 			true);
 
 		//Use INTERFACE
-		for (auto& CurrentHit : OutHits)
+		for (auto& CurrentHit : LeftHits)
 		{
 			if (CurrentHit.GetActor())
 			{
-				HitActor = CurrentHit.GetActor();
+				WCHitActor = CurrentHit.GetActor();
 			}
-			if (!AlreadyHitActors.Contains(CurrentHit.GetActor()))
+			if (!AlreadyHitActors_L.Contains(CurrentHit.GetActor()))
 			{
-				AlreadyHitActors.AddUnique(HitActor);
-				//TODO: Apply Damage
+				AlreadyHitActors_L.AddUnique(WCHitActor);
+				//TODO
 				//UGameplayStatics::ApplyDamage()
 			}
 		}
 
-		
+		for (auto& CurrentHit : RightHits)
+		{
+			if (CurrentHit.GetActor())
+			{
+				WCHitActor = CurrentHit.GetActor();
+			}
+			if (!AlreadyHitActors_R.Contains(CurrentHit.GetActor()))
+			{
+				AlreadyHitActors_R.AddUnique(WCHitActor);
+				//TODO
+				//UGameplayStatics::ApplyDamage()
+			}
+		}
 	}
 }
 
@@ -234,10 +265,10 @@ void APlayableCharacter::SoftLockOn()
 
 		if (TargetHit)
 		{
-			AActor* SoftActor = OutHit.GetActor();
+			AActor* HitActor = OutHit.GetActor();
 			if (HitActor)
 			{
-				SoftTarget = SoftActor;
+				SoftTarget = HitActor;
 			}
 		}
 		else
@@ -279,11 +310,11 @@ void APlayableCharacter::HardLockOn()
 
 			if (TargetHit)
 			{
-				AActor* HardActor = OutHit.GetActor();
+				AActor* HitActor = OutHit.GetActor();
 				if (HitActor)
 				{
 					bTargeting = true;
-					HardTarget = HardActor;
+					HardTarget = HitActor;
 				}
 			}
 		}
@@ -347,7 +378,6 @@ void APlayableCharacter::HeavyAttackPaused()
 	bHeavyAttackPaused = true;
 	OnAttackPausedEvent.Broadcast();
 }
-
 
 //------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
 
@@ -520,7 +550,8 @@ void APlayableCharacter::InputHeavyAttack()
 
 void APlayableCharacter::StartWeaponCollision()
 {
-	AlreadyHitActors.Empty();
+	AlreadyHitActors_L.Empty();
+	AlreadyHitActors_R.Empty();
 	bActiveCollision = true;
 }
 void APlayableCharacter::EndWeaponCollision()
