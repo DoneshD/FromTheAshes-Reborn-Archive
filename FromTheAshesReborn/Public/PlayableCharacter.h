@@ -164,10 +164,21 @@ private:
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
-	TArray<TObjectPtr<UAnimMontage>> DodgeArray;
+	TObjectPtr<UAnimMontage> ForwardDodgeArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TObjectPtr<UAnimMontage> BackDodgeArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TArray<TObjectPtr<UAnimMontage>> LeftDodgeArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TArray<TObjectPtr<UAnimMontage>> RightDodgeArray;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Roll Anim")
 	TArray<TObjectPtr<UAnimMontage>> RollArray;
+
+	TMap<int, int> YCardinalMapping;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

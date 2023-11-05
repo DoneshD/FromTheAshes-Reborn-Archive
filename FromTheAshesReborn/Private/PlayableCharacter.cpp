@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -89,6 +88,15 @@ bool APlayableCharacter::CanAttack()
 bool APlayableCharacter::CanDodge()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Dodge, EStates::EState_Execution };
+
+	bool IsCharacterFalling = GetCharacterMovement()->IsFalling();
+	bool CanDodge = bCanDodge;
+	bool IsStateEqualToAnyResult = IsStateEqualToAny(MakeArray);
+
+	// Combine the conditions into a single bool
+	bool CombinedCondition = !IsCharacterFalling && CanDodge && !IsStateEqualToAnyResult;
+
+	// Print the combined condition
 	return !GetCharacterMovement()->IsFalling() && bCanDodge && !IsStateEqualToAny(MakeArray);
 }
 
@@ -96,6 +104,8 @@ bool APlayableCharacter::CanDodge()
 
 void APlayableCharacter::Tick(float DeltaTime)
 {
+
+	//------------------------------------------------------------ TICK::Targeting -----------------------------------------------------------------//
 	Super::Tick(DeltaTime);
 	if (bTargeting && HardTarget)
 	{
@@ -249,9 +259,26 @@ void APlayableCharacter::DisableRoll()
 
 void APlayableCharacter::DodgeSystem(float X, float Y)
 {
-	UE_LOG(LogTemp, Warning, TEXT("System"));
-	UE_LOG(LogTemp, Warning, TEXT("Float Value X: %f, Y: %f"), X, Y);
-	PlayAnimMontage(DodgeArray[0]);
+	//UE_LOG(LogTemp, Warning, TEXT("Float Value X: %f, Y: %f"), X, Y);
+	//PlayAnimMontage(DodgeArray[0]);
+	YCardinalMapping.Add(-1, 0);
+	YCardinalMapping.Add(0, 1);
+	YCardinalMapping.Add(1, 2);
+	int CardinalIndex = YCardinalMapping[Y];
+
+	if (X > 0.f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Right"));
+	}
+	else if (X < 0.f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Left"));
+		PlayAnimMontage(LeftDodgeArray[CardinalIndex]);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Neutral"));
+	}
 }
 
 void APlayableCharacter::SaveDodge()
@@ -260,7 +287,6 @@ void APlayableCharacter::SaveDodge()
 	{
 		bDodgeSaved = false;
 		TArray<EStates> MakeArray = { EStates::EState_Dodge };
-		//IDK if this is right
 		if (!IsStateEqualToAny(MakeArray))
 		{
 			SetState(EStates::EState_Dodge);
@@ -271,8 +297,6 @@ void APlayableCharacter::SaveDodge()
 
 void APlayableCharacter::PerformDodge()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Start"));
-
 	//StopRotation01()
 	//StopRotation02()
 	SoftTarget = NULL;
@@ -285,7 +309,7 @@ void APlayableCharacter::PerformDodge()
 	}
 	else
 	{
-		PlayAnimMontage(DodgeArray[0]);
+		PlayAnimMontage(ForwardDodgeArray);
 	}
 	if (bCanRoll)
 	{
@@ -405,7 +429,6 @@ void APlayableCharacter::HardLockOn()
 	{
 		bTargeting = false;
 		HardTarget = NULL;
-
 	}
 }
 

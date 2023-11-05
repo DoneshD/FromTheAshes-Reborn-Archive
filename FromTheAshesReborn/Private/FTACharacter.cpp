@@ -80,12 +80,6 @@ bool AFTACharacter::CanJump()
 	return !IsStateEqualToAny(MakeArray);
 }
 
-bool AFTACharacter::CanDodge()
-{
-	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
-	return !IsStateEqualToAny(MakeArray);
-}
-
 void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
