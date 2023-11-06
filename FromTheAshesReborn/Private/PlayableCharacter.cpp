@@ -259,25 +259,30 @@ void APlayableCharacter::DisableRoll()
 
 void APlayableCharacter::DodgeSystem(float X, float Y)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Float Value X: %f, Y: %f"), X, Y);
-	//PlayAnimMontage(DodgeArray[0]);
 	YCardinalMapping.Add(-1, 0);
 	YCardinalMapping.Add(0, 1);
 	YCardinalMapping.Add(1, 2);
-	int CardinalIndex = YCardinalMapping[Y];
+	int CardinalIndex = YCardinalMapping[static_cast<int>(Y)];
 
-	if (X > 0.f)
+	if (X < 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Right"));
+		PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[CardinalIndex]);
 	}
-	else if (X < 0.f)
+	else if (X > 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Left"));
-		PlayAnimMontage(LeftDodgeArray[CardinalIndex]);
+		PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[CardinalIndex]);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Neutral"));
+		if (Y > 0)
+		{
+			PlayAnimMontage(ForwardDodgeAnim);
+		}
+		else if (Y < 0)
+		{
+			PlayAnimMontage(BackDodgeAnim);
+
+		}
 	}
 }
 
@@ -309,7 +314,7 @@ void APlayableCharacter::PerformDodge()
 	}
 	else
 	{
-		PlayAnimMontage(ForwardDodgeArray);
+		PlayAnimMontage(ForwardDodgeAnim);
 	}
 	if (bCanRoll)
 	{

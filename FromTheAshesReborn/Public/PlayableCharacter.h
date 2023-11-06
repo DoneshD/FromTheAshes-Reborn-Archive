@@ -13,6 +13,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackPausedEvent);
  * 
  */
 
+USTRUCT()
+struct FSideDodgeArray
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TArray<TObjectPtr<UAnimMontage>> SideDodgeArray;
+};
+
 UCLASS()
 class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 {
@@ -164,16 +173,13 @@ private:
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
-	TObjectPtr<UAnimMontage> ForwardDodgeArray;
+	TObjectPtr<UAnimMontage> ForwardDodgeAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
-	TObjectPtr<UAnimMontage> BackDodgeArray;
+	TObjectPtr<UAnimMontage> BackDodgeAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
-	TArray<TObjectPtr<UAnimMontage>> LeftDodgeArray;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
-	TArray<TObjectPtr<UAnimMontage>> RightDodgeArray;
+	TArray<FSideDodgeArray> CardinalDodgeArray;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Roll Anim")
 	TArray<TObjectPtr<UAnimMontage>> RollArray;
@@ -186,3 +192,4 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 };
+
