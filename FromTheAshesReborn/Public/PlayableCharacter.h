@@ -179,10 +179,16 @@ private:
 	TObjectPtr<UAnimMontage> BackDodgeAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TObjectPtr<UAnimMontage> ForwardRollAnim;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TObjectPtr<UAnimMontage> BackRollAnim;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalDodgeArray;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Roll Anim")
-	TArray<TObjectPtr<UAnimMontage>> RollArray;
+	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
+	TArray<FSideDodgeArray> CardinalRollArray;
 
 	TMap<int, int> YCardinalMapping;
 
