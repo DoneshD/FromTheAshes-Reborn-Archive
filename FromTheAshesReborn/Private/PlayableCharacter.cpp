@@ -269,13 +269,10 @@ void APlayableCharacter::DodgeSystem(float X, float Y)
 		if (bCanRoll)
 		{
 			PlayAnimMontage(CardinalRollArray[0].SideDodgeArray[CardinalIndex]);
-			UE_LOG(LogTemp, Warning, TEXT("Rolling"));
 		}
 		else
 		{
 			PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[CardinalIndex]);
-			UE_LOG(LogTemp, Warning, TEXT("Sliding"));
-
 		}
 	}
 	else if (X > 0.f)
@@ -283,26 +280,19 @@ void APlayableCharacter::DodgeSystem(float X, float Y)
 		if (bCanRoll)
 		{
 			PlayAnimMontage(CardinalRollArray[1].SideDodgeArray[CardinalIndex]);
-			UE_LOG(LogTemp, Warning, TEXT("Rolling"));
-
 		}
 		else
 		{
 			PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[CardinalIndex]);
-			UE_LOG(LogTemp, Warning, TEXT("Sliding"));
 		}
 	}
 	else
 	{
 		if (Y > 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Here"));
-
 			if (bCanRoll)
 			{
 				PlayAnimMontage(ForwardRollAnim);
-				UE_LOG(LogTemp, Warning, TEXT("HereRoll"));
-
 			}
 			else
 			{
@@ -348,13 +338,13 @@ void APlayableCharacter::PerformDodge()
 	if (bTargeting)
 	{
 		DodgeSystem(InputDirection.X, InputDirection.Y);
+		SetState(EStates::EState_Dodge);
 	}
 	else
 	{
 		PlayAnimMontage(ForwardDodgeAnim);
 		SetState(EStates::EState_Dodge);
 	}
-	SetState(EStates::EState_Dodge);
 }
 
 void APlayableCharacter::Dodge()
