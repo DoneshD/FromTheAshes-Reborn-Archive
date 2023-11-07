@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BufferTimeline.h"
-#include "Runtime/Engine/Classes/Components/TimelineComponent.h"
-//#include "Components/TimelineComponent.h"
 
 // Sets default values for this component's properties
 UBufferTimeline::UBufferTimeline()
@@ -11,7 +9,10 @@ UBufferTimeline::UBufferTimeline()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	BufferTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+	BufferTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+
+	InterpFunction.BindUFunction(this, FName("TimelineFloatReturn"));
+	TimelineFinished.BindUFunction(this, FName("OnTimelineFinished"));
 }
 
 
@@ -19,6 +20,11 @@ UBufferTimeline::UBufferTimeline()
 void UBufferTimeline::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (BufferCurve)
+	{
+		BufferTimeLine->AddInterpFloat(BufferCurve);
+	}
 
 	// ...
 	
@@ -31,5 +37,15 @@ void UBufferTimeline::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UBufferTimeline::TimelineFloatReturn(float value)
+{
+
+}
+
+void UBufferTimeline::OnTimelineFinished()
+{
+
 }
 

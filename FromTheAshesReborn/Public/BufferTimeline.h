@@ -4,17 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/TimelineComponent.h"
 #include "BufferTimeline.generated.h"
 
+class UTimelineComponent;
+class UCurveFloat;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FROMTHEASHESREBORN_API UBufferTimeline : public UActorComponent
 {
 	GENERATED_BODY()
 
-	class UTimelineComponent* BufferTimeline;
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UBufferTimeline();
 
@@ -22,12 +24,12 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
-	class UCurveFloat* FCurve;
+	UCurveFloat* BufferCurve;
 
 	UPROPERTY()
 	FVector StartLocation;
@@ -35,10 +37,21 @@ public:
 	UPROPERTY()
 	FVector EndLocation;
 
-	UPROPERTY(EditAnywhere, Category = "Timeline")
+	//UPROPERTY(EditAnywhere, Category = "Timeline")
 	float ZOffest;
 
-	void TimelineFloatReturn(float value);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTimelineComponent* BufferTimeLine;
 
-	void OnTimelineFinished();
+	UPROPERTY()
+	FOnTimelineFloat InterpFunction{};
+
+	UPROPERTY()
+	FOnTimelineEvent TimelineFinished{};
+
+	UFUNCTION()
+		void TimelineFloatReturn(float value);
+
+	UFUNCTION()
+		void OnTimelineFinished();
 };
