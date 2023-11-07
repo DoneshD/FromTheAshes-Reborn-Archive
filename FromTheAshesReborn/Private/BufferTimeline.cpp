@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BufferTimeline.h"
+#include "PlayableCharacter.h"
 
 // Sets default values for this component's properties
 UBufferTimeline::UBufferTimeline()
@@ -12,7 +13,9 @@ UBufferTimeline::UBufferTimeline()
 	BufferTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
 
 	InterpFunction.BindUFunction(this, FName("TimelineFloatReturn"));
-	TimelineFinished.BindUFunction(this, FName("OnTimelineFinished"));
+	UpdatedEvent.BindUFunction(this, FName("OnTimelineUpdate"));
+
+
 }
 
 
@@ -26,7 +29,7 @@ void UBufferTimeline::BeginPlay()
 		//Add float curve to timeline and connect it to the interpt functions delegates
 		BufferTimeLine->AddInterpFloat(BufferCurve, InterpFunction, FName("Alpha"));
 
-		BufferTimeLine->SetTimelineFinishedFunc(TimelineFinished);
+		BufferTimeLine->SetTimelineFinishedFunc(UpdatedEvent);
 
 		//Game Specific Logic?
 
@@ -48,21 +51,26 @@ void UBufferTimeline::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
-void UBufferTimeline::TimelineFloatReturn(float value)
+void UBufferTimeline::EndPlay()
 {
-	//Lerp logic
+	BufferTimeLine->Stop();
 }
 
-void UBufferTimeline::OnTimelineFinished()
+void UBufferTimeline::TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation)
 {
-	if (BufferTimeLine->GetPlaybackPosition() == 0.0f)
-	{
-		GLog->Log("PLAY");
-		BufferTimeLine->Play();
-	}
-	else
-	{
-		BufferTimeLine->Reverse();
-	}
+	BufferTimeLine->PlayFromStart();
+	BufferLerp = FMath::Lerp(CurrentLocation, NewLocation, value);
+
+	//APlayableCharacter* PlayableCharacter = Cast<APlayableCharacter>(GetOwner());
+	//if (PlayableCharacter)
+	//{
+		//PlayableCharacter->SetActorLocation(BufferLerp);
+	//}
+
+}
+
+void UBufferTimeline::OnTimelineUpdate(FVector NewLocation)
+{
+	
 }
 

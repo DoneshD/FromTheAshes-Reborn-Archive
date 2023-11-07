@@ -4,7 +4,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "BufferTimeline.h"
+//#include "BufferTimeline.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"
@@ -246,6 +246,17 @@ void APlayableCharacter::EnableRootRotation()
 	}
 }
 
+void APlayableCharacter::StartBuffer(float Amount)
+{
+	FVector NewLocation = (GetActorForwardVector() * 3.0f) + GetActorLocation();
+	BufferTimeline->TimelineFloatReturn(3.0f, GetActorLocation(), NewLocation);
+	
+}
+
+void APlayableCharacter::StopBuffer()
+{
+	BufferTimeline->EndPlay();
+}
 //------------------------------------------------------------ Dodge -----------------------------------------------------------------//
 
 void APlayableCharacter::EnableRoll()
@@ -510,6 +521,8 @@ void APlayableCharacter::HeavyAttackPaused()
 	OnAttackPausedEvent.Broadcast();
 }
 
+//
+
 //------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
 
 void APlayableCharacter::PerformLightAttack(int AttackIndex)
@@ -518,7 +531,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 	if (CurrentMontage)
 	{
 		//StopBuffer()
-		//Buffer()
+		StartBuffer(3.0);
 		SetState(EStates::EState_Attack);
 		SoftLockOn();
 		PlayAnimMontage(CurrentMontage);

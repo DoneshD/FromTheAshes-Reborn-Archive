@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BufferTimeline.h"
 #include "PlayableCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackPausedEvent);
@@ -117,6 +118,12 @@ protected:
 	void SoftLockOn();
 	void HardLockOn();
 
+	//Timelines
+	void StartBuffer(float Amount);
+	void StopBuffer();
+
+	UBufferTimeline* BufferTimeline;
+
 private:
 
 	//Lock Ons
@@ -162,7 +169,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> HeavyAttackCombo;
 
@@ -171,13 +177,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
-	
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardDodgeAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> BackDodgeAnim;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardRollAnim;
 

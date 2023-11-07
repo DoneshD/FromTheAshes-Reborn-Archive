@@ -31,15 +31,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	UCurveFloat* BufferCurve;
 
-	UPROPERTY()
-	FVector StartLocation;
-
-	UPROPERTY()
-	FVector EndLocation;
-
-	//UPROPERTY(EditAnywhere, Category = "Timeline")
-	float ZOffest;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTimelineComponent* BufferTimeLine;
 
@@ -47,11 +38,16 @@ public:
 	FOnTimelineFloat InterpFunction{};
 
 	UPROPERTY()
-	FOnTimelineEvent TimelineFinished{};
+	FOnTimelineEvent UpdatedEvent{};
 
 	UFUNCTION()
-		void TimelineFloatReturn(float value);
+		void EndPlay();
 
 	UFUNCTION()
-		void OnTimelineFinished();
+		void TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation);
+
+	UFUNCTION()
+		void OnTimelineUpdate(FVector NewLocation);
+
+	FVector BufferLerp;
 };
