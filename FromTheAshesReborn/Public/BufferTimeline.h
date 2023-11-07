@@ -29,5 +29,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	class UCurveFloat* FCurve;
 
-		
+	UPROPERTY()
+	FVector StartLocation;
+
+	UPROPERTY()
+	FVector EndLocation;
+
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	float ZOffest;
+
+	void TimelineFloatReturn(float value);
+
+	void OnTimelineFinished();
 };
