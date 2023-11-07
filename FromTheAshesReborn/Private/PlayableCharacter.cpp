@@ -4,6 +4,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "BufferTimeline.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"

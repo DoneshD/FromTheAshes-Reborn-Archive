@@ -23,7 +23,16 @@ void UBufferTimeline::BeginPlay()
 
 	if (BufferCurve)
 	{
-		BufferTimeLine->AddInterpFloat(BufferCurve);
+		//Add float curve to timeline and connect it to the interpt functions delegates
+		BufferTimeLine->AddInterpFloat(BufferCurve, InterpFunction, FName("Alpha"));
+
+		BufferTimeLine->SetTimelineFinishedFunc(TimelineFinished);
+
+		//Game Specific Logic?
+
+		//Set settings
+		BufferTimeLine->SetLooping(false);
+		BufferTimeLine->SetIgnoreTimeDilation(true);
 	}
 
 	// ...
@@ -41,11 +50,19 @@ void UBufferTimeline::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UBufferTimeline::TimelineFloatReturn(float value)
 {
-
+	//Lerp logic
 }
 
 void UBufferTimeline::OnTimelineFinished()
 {
-
+	if (BufferTimeLine->GetPlaybackPosition() == 0.0f)
+	{
+		GLog->Log("PLAY");
+		BufferTimeLine->Play();
+	}
+	else
+	{
+		BufferTimeLine->Reverse();
+	}
 }
 
