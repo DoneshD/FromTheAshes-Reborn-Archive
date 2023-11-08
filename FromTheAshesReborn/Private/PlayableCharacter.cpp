@@ -4,7 +4,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-//#include "BufferTimeline.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputComponent.h"
@@ -27,6 +26,29 @@ APlayableCharacter::APlayableCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
+	BufferTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+
+	InterpFunction.BindUFunction(this, FName("TimelineFloatReturn"));
+	UpdatedEvent.BindUFunction(this, FName("OnTimelineUpdate"));
+}
+
+void APlayableCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	if (BufferCurve)
+	{
+		//Add float curve to timeline and connect it to the interpt functions delegates
+		BufferTimeLine->AddInterpFloat(BufferCurve, InterpFunction, FName("Alpha"));
+
+		BufferTimeLine->SetTimelineFinishedFunc(UpdatedEvent);
+
+		//Game Specific Logic?
+
+		//Set settings
+		BufferTimeLine->SetLooping(false);
+		BufferTimeLine->SetIgnoreTimeDilation(true);
+	}
 }
 
 //------------------------------------------------------------- FSM Resets -----------------------------------------------------------------//
@@ -68,7 +90,7 @@ void APlayableCharacter::ResetState()
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
 
-	SetState(EStates::EState_Nothing);
+	
 	SoftTarget = NULL;
 	bCanDodge = true;
 	bDodgeSaved = false;
@@ -78,6 +100,9 @@ void APlayableCharacter::ResetState()
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ClearAttackPausedTimer();
+	//StopBuffer();
+
+	SetState(EStates::EState_Nothing);
 }
 
 bool APlayableCharacter::CanAttack()
@@ -204,6 +229,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 	}
 }
 
+
 //--------------------------------------------------------- PlayerInputComponent ---------------------------------------------------------------------//
 
 void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -246,17 +272,32 @@ void APlayableCharacter::EnableRootRotation()
 	}
 }
 
+
 void APlayableCharacter::StartBuffer(float Amount)
 {
-	FVector NewLocation = (GetActorForwardVector() * 3.0f) + GetActorLocation();
-	BufferTimeline->TimelineFloatReturn(3.0f, GetActorLocation(), NewLocation);
+	//FVector NewLocation = (GetActorForwardVector() * 3.0f) + GetActorLocation();
 	
 }
 
 void APlayableCharacter::StopBuffer()
 {
-	BufferTimeline->EndPlay();
+	
 }
+
+//------------------------------------------------------------ Timelines -----------------------------------------------------------------//
+
+
+void APlayableCharacter::TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation)
+{
+
+}
+
+void APlayableCharacter::OnTimelineUpdate(FVector NewLocation)
+{
+
+}
+
+
 //------------------------------------------------------------ Dodge -----------------------------------------------------------------//
 
 void APlayableCharacter::EnableRoll()

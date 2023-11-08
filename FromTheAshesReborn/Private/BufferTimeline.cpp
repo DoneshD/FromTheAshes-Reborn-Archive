@@ -14,8 +14,6 @@ UBufferTimeline::UBufferTimeline()
 
 	InterpFunction.BindUFunction(this, FName("TimelineFloatReturn"));
 	UpdatedEvent.BindUFunction(this, FName("OnTimelineUpdate"));
-
-
 }
 
 
@@ -51,10 +49,6 @@ void UBufferTimeline::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
-void UBufferTimeline::EndPlay()
-{
-	BufferTimeLine->Stop();
-}
 
 void UBufferTimeline::TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation)
 {

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "BufferTimeline.h"
+#include "Components/TimelineComponent.h"
 #include "PlayableCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackPausedEvent);
@@ -23,6 +23,9 @@ struct FSideDodgeArray
 	TArray<TObjectPtr<UAnimMontage>> SideDodgeArray;
 };
 
+class UTimelineComponent;
+class UCurveFloat;
+
 UCLASS()
 class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 {
@@ -32,6 +35,9 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 protected:
 	//Constructor
 	APlayableCharacter();
+
+	//BeginPlay
+	virtual void BeginPlay() override;
 
 	//Casts
 	TObjectPtr<AFTACharacter> FTACharacter;
@@ -122,8 +128,6 @@ protected:
 	void StartBuffer(float Amount);
 	void StopBuffer();
 
-	UBufferTimeline* BufferTimeline;
-
 private:
 
 	//Lock Ons
@@ -157,16 +161,13 @@ private:
 	TArray<TObjectPtr<AActor>> AlreadyHitActors_L;
 	TArray<TObjectPtr<AActor>> AlreadyHitActors_R;
 
-
 	//Timers
 	FTimerHandle AttackPauseHandle;
 	FOnAttackPausedEvent OnAttackPausedEvent;
-
-	//Timelines
-	
 	//Execution
 	bool bExecuting;
 
+	TMap<int, int> YCardinalMapping;
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
@@ -194,7 +195,26 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
 
-	TMap<int, int> YCardinalMapping;
+	//Timelines
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* BufferCurve;
+
+	UPROPERTY()
+	UTimelineComponent* BufferTimeLine;
+
+	UPROPERTY()
+	FOnTimelineFloat InterpFunction{};
+
+	UPROPERTY()
+	FOnTimelineEvent UpdatedEvent{};
+
+	UFUNCTION()
+		void TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation);
+
+	UFUNCTION()
+		void OnTimelineUpdate(FVector NewLocation);
+
+	FVector BufferLerp;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -41,9 +41,6 @@ public:
 	FOnTimelineEvent UpdatedEvent{};
 
 	UFUNCTION()
-		void EndPlay();
-
-	UFUNCTION()
 		void TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation);
 
 	UFUNCTION()
