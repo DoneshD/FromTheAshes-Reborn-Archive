@@ -125,7 +125,7 @@ protected:
 	void HardLockOn();
 
 	//Timelines
-	void StartBuffer(float Amount);
+	void StartBuffer();
 	void StopBuffer();
 
 private:
@@ -199,6 +199,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	UCurveFloat* BufferCurve;
 
+	float BufferAmount;
+
 	UPROPERTY()
 	UTimelineComponent* BufferTimeLine;
 
@@ -209,10 +211,10 @@ private:
 	FOnTimelineEvent UpdatedEvent{};
 
 	UFUNCTION()
-		void TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation);
+		void TimelineFloatReturn(float value);
 
 	UFUNCTION()
-		void OnTimelineUpdate(FVector NewLocation);
+		void OnTimelineFinished();
 
 	FVector BufferLerp;
 

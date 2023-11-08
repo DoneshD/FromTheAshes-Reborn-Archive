@@ -30,7 +30,7 @@ APlayableCharacter::APlayableCharacter()
 	BufferTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
 
 	InterpFunction.BindUFunction(this, FName("TimelineFloatReturn"));
-	UpdatedEvent.BindUFunction(this, FName("OnTimelineUpdate"));
+	UpdatedEvent.BindUFunction(this, FName("OnTimelineFinsihed"));
 }
 
 void APlayableCharacter::BeginPlay()
@@ -273,28 +273,32 @@ void APlayableCharacter::EnableRootRotation()
 }
 
 
-void APlayableCharacter::StartBuffer(float Amount)
+void APlayableCharacter::StartBuffer()
 {
-	//FVector NewLocation = (GetActorForwardVector() * 3.0f) + GetActorLocation();
-	
+	BufferTimeLine->PlayFromStart();
 }
 
 void APlayableCharacter::StopBuffer()
 {
-	
+	//Implement?
 }
 
 //------------------------------------------------------------ Timelines -----------------------------------------------------------------//
 
 
-void APlayableCharacter::TimelineFloatReturn(float value, FVector CurrentLocation, FVector NewLocation)
+void APlayableCharacter::TimelineFloatReturn(float value)
 {
-
+	BufferAmount = 3.0f;
+	FVector NewLocation = (GetActorForwardVector() * BufferAmount) + GetActorLocation();
+	SetActorLocation(NewLocation);
 }
 
-void APlayableCharacter::OnTimelineUpdate(FVector NewLocation)
+void APlayableCharacter::OnTimelineFinished()
 {
-
+	//????
+	UE_LOG(LogTemp, Warning, TEXT("Here2"));
+	BufferTimeLine->Stop();
+	
 }
 
 
@@ -386,7 +390,7 @@ void APlayableCharacter::PerformDodge()
 	//StopRotation02()
 	SoftTarget = NULL;
 	//StopBuffer()
-	//Buffer()
+	StartBuffer();
 
 	if (bTargeting)
 	{
@@ -572,7 +576,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 	if (CurrentMontage)
 	{
 		//StopBuffer()
-		StartBuffer(3.0);
+		StartBuffer();
 		SetState(EStates::EState_Attack);
 		SoftLockOn();
 		PlayAnimMontage(CurrentMontage);
@@ -629,7 +633,7 @@ void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> Paus
 	if (AttackMontage)
 	{
 		//StopBuffer();
-		//Buffer();
+		StartBuffer();
 		SetState(EStates::EState_Attack);
 		//SoftLock();
 		PlayAnimMontage(AttackMontage);
@@ -645,7 +649,6 @@ void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> Paus
 //TODO: Select combo for scalability
 void APlayableCharacter::SelectHeavyCombo()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("HeavyAttackIndex: %d"), NewHeavyAttackIndex);
 	if (HeavyAttackIndex == 1)
 	{
 		PerformHeavyCombo(PausedHeavyAttackCombo1);
@@ -670,7 +673,7 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 	if (CurrentMontage)
 	{
 		//StopBuffer()
-		//Buffer()
+		StartBuffer();
 		SetState(EStates::EState_Attack);
 		//SoftLock()
 		PlayAnimMontage(CurrentMontage);
@@ -693,7 +696,6 @@ void APlayableCharacter::HeavyAttack()
 {
 	if (CanAttack())
 	{
-		//Clear Timer : Attack Paused
 		ClearAttackPausedTimer();
 		bHeavyAttackPaused = false;
 		ResetLightAttack();
