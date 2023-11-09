@@ -86,17 +86,17 @@ void APlayableCharacter::ResetState()
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
 
-	
 	SoftTarget = NULL;
 	bCanDodge = true;
 	bDodgeSaved = false;
 	bCanRoll = false;
 
+	//StopBuffer();
+	StopSoftRotation();
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ClearAttackPausedTimer();
-	//StopBuffer();
 
 	SetState(EStates::EState_Nothing);
 }
@@ -114,7 +114,6 @@ bool APlayableCharacter::CanDodge()
 }
 
 //------------------------------------------------------------- Tick -----------------------------------------------------------------//
-
 
 void APlayableCharacter::Tick(float DeltaTime)
 {
@@ -485,7 +484,7 @@ void APlayableCharacter::HardLockOn()
 {
 	if (!bTargeting && !HardTarget)
 	{
-
+		GetCharacterMovement()->bOrientRotationToMovement = false;
 		if (UCameraComponent* FollowCamera = this->CameraComp)
 		{
 			FVector CameraVector = FollowCamera->GetForwardVector();
@@ -525,6 +524,7 @@ void APlayableCharacter::HardLockOn()
 	{
 		bTargeting = false;
 		HardTarget = NULL;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 }
 
@@ -579,8 +579,6 @@ void APlayableCharacter::HeavyAttackPaused()
 	bHeavyAttackPaused = true;
 	OnAttackPausedEvent.Broadcast();
 }
-
-//
 
 //------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
 
