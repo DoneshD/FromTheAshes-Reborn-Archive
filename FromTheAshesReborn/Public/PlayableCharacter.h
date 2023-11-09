@@ -39,9 +39,6 @@ protected:
 	//BeginPlay
 	virtual void BeginPlay() override;
 
-	//Casts
-	TObjectPtr<AFTACharacter> FTACharacter;
-
 	//Inputs
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LightAttack;
@@ -195,33 +192,26 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
 
-	//Timelines
-	UPROPERTY(EditAnywhere, Category = "Timeline")
-	UCurveFloat* BufferCurve;
-
-	float BufferAmount;
-
-	UPROPERTY()
-	UTimelineComponent* BufferTimeLine;
-
-	UPROPERTY()
-	FOnTimelineFloat InterpFunction{};
-
-	UPROPERTY()
-	FOnTimelineEvent UpdatedEvent{};
-
-	UFUNCTION()
-		void TimelineFloatReturn(float value);
-
-	UFUNCTION()
-		void OnTimelineFinished();
-
-	FVector BufferLerp;
-
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
 
+	//Timelines
+	UTimelineComponent* Timeline;
+
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* BufferCurve;
+
+	FOnTimelineFloat InterpFunction{};
+
+	FOnTimelineEvent TimelineFinished{};
+
+	UFUNCTION()
+	void TimelineFloatReturn(float value);
+	UFUNCTION()
+	void OnTimelineFinished();
+
+	float BufferAmount;
 };
 

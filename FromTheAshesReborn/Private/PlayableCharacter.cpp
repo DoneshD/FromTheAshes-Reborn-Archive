@@ -27,10 +27,10 @@ APlayableCharacter::APlayableCharacter()
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
-	BufferTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
 
 	InterpFunction.BindUFunction(this, FName("TimelineFloatReturn"));
-	UpdatedEvent.BindUFunction(this, FName("OnTimelineFinsihed"));
+	TimelineFinished.BindUFunction(this, FName("OnTimelineFinished"));
 }
 
 void APlayableCharacter::BeginPlay()
@@ -38,16 +38,11 @@ void APlayableCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (BufferCurve)
 	{
-		//Add float curve to timeline and connect it to the interpt functions delegates
-		BufferTimeLine->AddInterpFloat(BufferCurve, InterpFunction, FName("Alpha"));
+		Timeline->AddInterpFloat(BufferCurve, InterpFunction, FName("Alpha"));
+		Timeline->SetTimelineFinishedFunc(TimelineFinished);
 
-		BufferTimeLine->SetTimelineFinishedFunc(UpdatedEvent);
-
-		//Game Specific Logic?
-
-		//Set settings
-		BufferTimeLine->SetLooping(false);
-		BufferTimeLine->SetIgnoreTimeDilation(true);
+		Timeline->SetLooping(false);
+		Timeline->SetIgnoreTimeDilation(true);
 	}
 }
 
@@ -114,15 +109,6 @@ bool APlayableCharacter::CanAttack()
 bool APlayableCharacter::CanDodge()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Dodge, EStates::EState_Execution };
-
-	bool IsCharacterFalling = GetCharacterMovement()->IsFalling();
-	bool CanDodge = bCanDodge;
-	bool IsStateEqualToAnyResult = IsStateEqualToAny(MakeArray);
-
-	// Combine the conditions into a single bool
-	bool CombinedCondition = !IsCharacterFalling && CanDodge && !IsStateEqualToAnyResult;
-
-	// Print the combined condition
 	return !GetCharacterMovement()->IsFalling() && bCanDodge && !IsStateEqualToAny(MakeArray);
 }
 
@@ -275,32 +261,28 @@ void APlayableCharacter::EnableRootRotation()
 
 void APlayableCharacter::StartBuffer()
 {
-	BufferTimeLine->PlayFromStart();
+	Timeline->PlayFromStart();
 }
 
 void APlayableCharacter::StopBuffer()
 {
-	//Implement?
+	Timeline->Stop();
 }
 
 //------------------------------------------------------------ Timelines -----------------------------------------------------------------//
 
-
 void APlayableCharacter::TimelineFloatReturn(float value)
 {
-	BufferAmount = 3.0f;
+	BufferAmount = 30.0f;
 	FVector NewLocation = (GetActorForwardVector() * BufferAmount) + GetActorLocation();
+	FVector BufferLocation = FMath::Lerp(GetActorLocation(), NewLocation, value);
 	SetActorLocation(NewLocation);
 }
 
 void APlayableCharacter::OnTimelineFinished()
 {
-	//????
-	UE_LOG(LogTemp, Warning, TEXT("Here2"));
-	BufferTimeLine->Stop();
-	
+	Timeline->Stop();
 }
-
 
 //------------------------------------------------------------ Dodge -----------------------------------------------------------------//
 
@@ -390,7 +372,7 @@ void APlayableCharacter::PerformDodge()
 	//StopRotation02()
 	SoftTarget = NULL;
 	//StopBuffer()
-	StartBuffer();
+	//StartBuffer();
 
 	if (bTargeting)
 	{
@@ -633,7 +615,7 @@ void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> Paus
 	if (AttackMontage)
 	{
 		//StopBuffer();
-		StartBuffer();
+		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		//SoftLock();
 		PlayAnimMontage(AttackMontage);
@@ -673,7 +655,7 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 	if (CurrentMontage)
 	{
 		//StopBuffer()
-		StartBuffer();
+		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		//SoftLock()
 		PlayAnimMontage(CurrentMontage);
@@ -736,5 +718,4 @@ void APlayableCharacter::StartWeaponCollision()
 void APlayableCharacter::EndWeaponCollision()
 {
 	bActiveCollision = false;
-
 }
