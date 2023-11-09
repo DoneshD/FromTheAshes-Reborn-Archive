@@ -117,8 +117,13 @@ protected:
 	void EnableRootRotation();
 
 	//LockOn
+	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();
-	void SoftLockOn();
+
+	void StopHardRotation();
+	void StopSoftRotation();
+
+	void SoftLockOn(float ForwardDistance);
 	void HardLockOn();
 
 	//Timelines
@@ -202,6 +207,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	UCurveFloat* BufferCurve;
+
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* RotationCurve;
 
 	FOnTimelineFloat InterpFunction{};
 
