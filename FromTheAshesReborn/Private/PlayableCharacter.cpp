@@ -129,7 +129,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 				FVector ResultVectorAVector(0, 0, 80.f);
 			}
 
-			FVector ResultVector(0, 0, 30.f);
+			FVector ResultVector(0, 0, 150.0f);
 			FVector TargetLocation = HardTarget->GetActorLocation() - ResultVector;
 			FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
 			FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.f);
@@ -281,7 +281,23 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 	//FVector BufferLocation = FMath::Lerp(GetActorLocation(), NewLocation, value);
 	//SetActorLocation(NewLocation);
 
-	if (SoftTarget || HardTarget)
+	if (HardTarget)
+	{
+		FVector TargetLocation = HardTarget->GetActorLocation();
+		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
+
+		FRotator MakeRotator(TargetRotation.Roll, GetActorRotation().Pitch, TargetRotation.Yaw);
+		FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, value, false);
+
+		SetActorRotation(InterpRot);
+		UE_LOG(LogTemp, Warning, TEXT("Rotate Actor"))
+	}
+	else
+	{
+		StopSoftRotation();
+	}
+
+	if (SoftTarget)
 	{
 		FVector TargetLocation = SoftTarget->GetActorLocation();
 		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
@@ -290,6 +306,7 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 		FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, value, false);
 
 		SetActorRotation(InterpRot);
+		UE_LOG(LogTemp, Warning, TEXT("Rotate Actor"))
 	}
 	else
 	{
@@ -316,11 +333,11 @@ void APlayableCharacter::StopSoftRotation()
 
 void APlayableCharacter::RotationToTarget()
 {
-	if (SoftTarget)
-	{
+	//if (SoftTarget)
+	//{
 		//TODO
 		Timeline->PlayFromStart();
-	}
+	//}
 }
 
 void APlayableCharacter::SoftLockOn(float ForwardDistance)
