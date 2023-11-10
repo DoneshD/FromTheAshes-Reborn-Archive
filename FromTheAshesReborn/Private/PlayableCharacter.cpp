@@ -92,7 +92,7 @@ void APlayableCharacter::ResetState()
 	bCanRoll = false;
 
 	//StopBuffer();
-	StopSoftRotation();
+	StopRotation();
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
@@ -140,6 +140,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 		{
 			bTargeting = false;
 			HardTarget = NULL;
+			GetCharacterMovement()->bOrientRotationToMovement = true;
 		}
 	}
 
@@ -216,7 +217,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 	}
 }
 
-
 //--------------------------------------------------------- PlayerInputComponent ---------------------------------------------------------------------//
 
 void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -262,12 +262,12 @@ void APlayableCharacter::EnableRootRotation()
 
 void APlayableCharacter::StartBuffer()
 {
-
+	//TODO 
 }
 
 void APlayableCharacter::StopBuffer()
 {
-
+	//TODO
 }
 
 
@@ -291,7 +291,7 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 	}
 	else
 	{
-		StopSoftRotation();
+		StopRotation();
 		return;
 	}
 	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetRotateLocation);
@@ -310,12 +310,8 @@ void APlayableCharacter::OnTimelineFinished()
 
 //------------------------------------------------------------- LockOn -----------------------------------------------------------------//
 
-void APlayableCharacter::StopHardRotation()
-{
 
-}
-
-void APlayableCharacter::StopSoftRotation()
+void APlayableCharacter::StopRotation()
 {
 	Timeline->Stop();
 }
@@ -329,13 +325,13 @@ void APlayableCharacter::RotationToTarget()
 	//}
 }
 
-void APlayableCharacter::SoftLockOn()
+void APlayableCharacter::SoftLockOn(float Distance)
 {
 	if (!bTargeting && !HardTarget)
 	{
 		//TODO: Find Good Trace and Timing
 		FVector StartLocation = (GetActorLocation() + GetCharacterMovement()->GetLastInputVector() * 100.f);
-		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * 250.0f) + StartLocation;
+		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * Distance) + StartLocation;
 		FHitResult OutHit;
 
 		TArray<AActor*> ActorArray;
@@ -368,7 +364,6 @@ void APlayableCharacter::SoftLockOn()
 		{
 			SoftTarget = NULL;
 		}
-		
 	}
 }
 
@@ -569,8 +564,7 @@ void APlayableCharacter::SaveDodge()
 
 void APlayableCharacter::PerformDodge()
 {
-	//StopRotation01()
-	//StopRotation02()
+	StopRotation();
 	SoftTarget = NULL;
 	//StopBuffer()
 	//StartBuffer();
@@ -609,7 +603,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 		//StopBuffer()
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
-		SoftLockOn();
+		SoftLockOn(250.0f);
 		PlayAnimMontage(CurrentMontage);
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
@@ -666,7 +660,7 @@ void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> Paus
 		//StopBuffer();
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
-		SoftLockOn();
+		SoftLockOn(250.0f);
 		PlayAnimMontage(AttackMontage);
 		NewHeavyAttackIndex++;
 		if (NewHeavyAttackIndex >= PausedHeavyAttackCombo.Num())
@@ -706,7 +700,7 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 		//StopBuffer()
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
-		SoftLockOn();
+		SoftLockOn(500.0f);
 		PlayAnimMontage(CurrentMontage);
 		StartAttackPausedTimer();
 		HeavyAttackIndex++;

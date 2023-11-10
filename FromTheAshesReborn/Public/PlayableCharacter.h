@@ -120,10 +120,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();
 
-	void StopHardRotation();
-	void StopSoftRotation();
+	void StopRotation();
 
-	void SoftLockOn();
+	void SoftLockOn(float Distance);
 	void HardLockOn();
 
 	//Timelines
