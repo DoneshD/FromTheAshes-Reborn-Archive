@@ -281,7 +281,7 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 	//FVector BufferLocation = FMath::Lerp(GetActorLocation(), NewLocation, value);
 	//SetActorLocation(NewLocation);
 
-	if (SoftTarget)
+	if (SoftTarget || HardTarget)
 	{
 		FVector TargetLocation = SoftTarget->GetActorLocation();
 		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
@@ -300,120 +300,6 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 void APlayableCharacter::OnTimelineFinished()
 {
 	Timeline->Stop();
-}
-
-//------------------------------------------------------------ Dodge -----------------------------------------------------------------//
-
-void APlayableCharacter::EnableRoll()
-{
-	bCanRoll = true;
-}
-
-void APlayableCharacter::DisableRoll()
-{
-	bCanRoll = false;
-}
-
-void APlayableCharacter::DodgeSystem(float X, float Y)
-{
-	YCardinalMapping.Add(-1, 0);
-	YCardinalMapping.Add(0, 1);
-	YCardinalMapping.Add(1, 2);
-	int CardinalIndex = YCardinalMapping[static_cast<int>(Y)];
-
-	if (X < 0.f)
-	{
-		if (bCanRoll)
-		{
-			PlayAnimMontage(CardinalRollArray[0].SideDodgeArray[CardinalIndex]);
-		}
-		else
-		{
-			PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[CardinalIndex]);
-		}
-	}
-	else if (X > 0.f)
-	{
-		if (bCanRoll)
-		{
-			PlayAnimMontage(CardinalRollArray[1].SideDodgeArray[CardinalIndex]);
-		}
-		else
-		{
-			PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[CardinalIndex]);
-		}
-	}
-	else
-	{
-		if (Y > 0)
-		{
-			if (bCanRoll)
-			{
-				PlayAnimMontage(ForwardRollAnim);
-			}
-			else
-			{
-				PlayAnimMontage(ForwardDodgeAnim);
-			}
-		}
-		else if (Y < 0)
-		{
-			if (bCanRoll)
-			{
-				PlayAnimMontage(BackRollAnim);
-			}
-			else
-			{
-				PlayAnimMontage(BackDodgeAnim);
-			}
-		}
-	}
-}
-
-void APlayableCharacter::SaveDodge()
-{
-	if (bDodgeSaved)
-	{
-		bDodgeSaved = false;
-		TArray<EStates> MakeArray = { EStates::EState_Dodge };
-		if (!IsStateEqualToAny(MakeArray))
-		{
-			SetState(EStates::EState_Dodge);
-		}
-		PerformDodge();
-	}
-}
-
-void APlayableCharacter::PerformDodge()
-{
-	//StopRotation01()
-	//StopRotation02()
-	SoftTarget = NULL;
-	//StopBuffer()
-	//StartBuffer();
-
-	if (bTargeting)
-	{
-		DodgeSystem(InputDirection.X, InputDirection.Y);
-		SetState(EStates::EState_Dodge);
-	}
-	else
-	{
-		PlayAnimMontage(ForwardDodgeAnim);
-		SetState(EStates::EState_Dodge);
-	}
-}
-
-void APlayableCharacter::Dodge()
-{
-	if (CanDodge())
-	{
-		PerformDodge();
-	}
-	else
-	{
-		bDodgeSaved = true;
-	}
 }
 
 //------------------------------------------------------------- LockOn -----------------------------------------------------------------//
@@ -528,6 +414,19 @@ void APlayableCharacter::HardLockOn()
 	}
 }
 
+//------------------------------------------------------------ Weapon Collisions -----------------------------------------------------------------//
+
+void APlayableCharacter::StartWeaponCollision()
+{
+	AlreadyHitActors_L.Empty();
+	AlreadyHitActors_R.Empty();
+	bActiveCollision = true;
+}
+void APlayableCharacter::EndWeaponCollision()
+{
+	bActiveCollision = false;
+}
+
 //---------------------------------------------------------- Attack Saves -----------------------------------------------------------------//
 
 void APlayableCharacter::SaveLightAttack()
@@ -578,6 +477,120 @@ void APlayableCharacter::HeavyAttackPaused()
 {
 	bHeavyAttackPaused = true;
 	OnAttackPausedEvent.Broadcast();
+}
+
+//------------------------------------------------------------ Dodge -----------------------------------------------------------------//
+
+void APlayableCharacter::EnableRoll()
+{
+	bCanRoll = true;
+}
+
+void APlayableCharacter::DisableRoll()
+{
+	bCanRoll = false;
+}
+
+void APlayableCharacter::DodgeSystem(float X, float Y)
+{
+	YCardinalMapping.Add(-1, 0);
+	YCardinalMapping.Add(0, 1);
+	YCardinalMapping.Add(1, 2);
+	int CardinalIndex = YCardinalMapping[static_cast<int>(Y)];
+
+	if (X < 0.f)
+	{
+		if (bCanRoll)
+		{
+			PlayAnimMontage(CardinalRollArray[0].SideDodgeArray[CardinalIndex]);
+		}
+		else
+		{
+			PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[CardinalIndex]);
+		}
+	}
+	else if (X > 0.f)
+	{
+		if (bCanRoll)
+		{
+			PlayAnimMontage(CardinalRollArray[1].SideDodgeArray[CardinalIndex]);
+		}
+		else
+		{
+			PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[CardinalIndex]);
+		}
+	}
+	else
+	{
+		if (Y > 0)
+		{
+			if (bCanRoll)
+			{
+				PlayAnimMontage(ForwardRollAnim);
+			}
+			else
+			{
+				PlayAnimMontage(ForwardDodgeAnim);
+			}
+		}
+		else if (Y < 0)
+		{
+			if (bCanRoll)
+			{
+				PlayAnimMontage(BackRollAnim);
+			}
+			else
+			{
+				PlayAnimMontage(BackDodgeAnim);
+			}
+		}
+	}
+}
+
+void APlayableCharacter::SaveDodge()
+{
+	if (bDodgeSaved)
+	{
+		bDodgeSaved = false;
+		TArray<EStates> MakeArray = { EStates::EState_Dodge };
+		if (!IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Dodge);
+		}
+		PerformDodge();
+	}
+}
+
+void APlayableCharacter::PerformDodge()
+{
+	//StopRotation01()
+	//StopRotation02()
+	SoftTarget = NULL;
+	//StopBuffer()
+	//StartBuffer();
+
+	if (bTargeting)
+	{
+		DodgeSystem(InputDirection.X, InputDirection.Y);
+		SetState(EStates::EState_Dodge);
+	}
+	else
+	{
+		PlayAnimMontage(ForwardDodgeAnim);
+		SetState(EStates::EState_Dodge);
+	}
+}
+
+void APlayableCharacter::Dodge()
+{
+	if (CanDodge())
+	{
+		PerformDodge();
+	}
+	else
+	{
+		bDodgeSaved = true;
+	}
 }
 
 //------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
@@ -735,17 +748,4 @@ void APlayableCharacter::InputHeavyAttack()
 	{
 		HeavyAttack();
 	}
-}
-
-//------------------------------------------------------------ Weapon Collisions -----------------------------------------------------------------//
-
-void APlayableCharacter::StartWeaponCollision()
-{
-	AlreadyHitActors_L.Empty();
-	AlreadyHitActors_R.Empty();
-	bActiveCollision = true;
-}
-void APlayableCharacter::EndWeaponCollision()
-{
-	bActiveCollision = false;
 }
