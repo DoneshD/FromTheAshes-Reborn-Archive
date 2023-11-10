@@ -123,7 +123,7 @@ protected:
 	void StopHardRotation();
 	void StopSoftRotation();
 
-	void SoftLockOn(float ForwardDistance);
+	void SoftLockOn();
 	void HardLockOn();
 
 	//Timelines
@@ -134,6 +134,7 @@ private:
 
 	//Lock Ons
 	bool bTargeting = false;
+	FVector TargetRotateLocation;
 
 	TObjectPtr<AActor> HardTarget;
 	TObjectPtr<AActor> SoftTarget;

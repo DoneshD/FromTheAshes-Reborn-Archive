@@ -283,35 +283,24 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 
 	if (HardTarget)
 	{
-		FVector TargetLocation = HardTarget->GetActorLocation();
-		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
-
-		FRotator MakeRotator(TargetRotation.Roll, GetActorRotation().Pitch, TargetRotation.Yaw);
-		FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, value, false);
-
-		SetActorRotation(InterpRot);
-		UE_LOG(LogTemp, Warning, TEXT("Rotate Actor"))
+		TargetRotateLocation = HardTarget->GetActorLocation();
+	}
+	else if (SoftTarget)
+	{
+		TargetRotateLocation = SoftTarget->GetActorLocation();
 	}
 	else
 	{
 		StopSoftRotation();
+		return;
 	}
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetRotateLocation);
 
-	if (SoftTarget)
-	{
-		FVector TargetLocation = SoftTarget->GetActorLocation();
-		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
+	FRotator MakeRotator(TargetRotation.Roll, GetActorRotation().Pitch, TargetRotation.Yaw);
+	FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, value, false);
 
-		FRotator MakeRotator(TargetRotation.Roll, GetActorRotation().Pitch, TargetRotation.Yaw);
-		FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, value, false);
-
-		SetActorRotation(InterpRot);
-		UE_LOG(LogTemp, Warning, TEXT("Rotate Actor"))
-	}
-	else
-	{
-		StopSoftRotation();
-	}
+	SetActorRotation(InterpRot);
+	UE_LOG(LogTemp, Warning, TEXT("Rotate Actor"))
 }
 
 void APlayableCharacter::OnTimelineFinished()
@@ -340,13 +329,13 @@ void APlayableCharacter::RotationToTarget()
 	//}
 }
 
-void APlayableCharacter::SoftLockOn(float ForwardDistance)
+void APlayableCharacter::SoftLockOn()
 {
 	if (!bTargeting && !HardTarget)
 	{
 		//TODO: Find Good Trace and Timing
-		FVector StartLocation = (GetCharacterMovement()->GetLastInputVector() * -ForwardDistance * 2) + GetActorLocation();
-		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * ForwardDistance) + GetActorLocation();
+		FVector StartLocation = (GetActorLocation() + GetCharacterMovement()->GetLastInputVector() * 100.f);
+		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * 250.0f) + StartLocation;
 		FHitResult OutHit;
 
 		TArray<AActor*> ActorArray;
@@ -359,7 +348,7 @@ void APlayableCharacter::SoftLockOn(float ForwardDistance)
 			GetWorld(), 
 			StartLocation,
 			EndLocation, 
-			100.f, 
+			50.f, 
 			ObjectTypes, 
 			false, 
 			ActorArray, 
@@ -620,7 +609,7 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 		//StopBuffer()
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
-		SoftLockOn(250.0f);
+		SoftLockOn();
 		PlayAnimMontage(CurrentMontage);
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
@@ -677,7 +666,7 @@ void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> Paus
 		//StopBuffer();
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
-		SoftLockOn(1000.0f);
+		SoftLockOn();
 		PlayAnimMontage(AttackMontage);
 		NewHeavyAttackIndex++;
 		if (NewHeavyAttackIndex >= PausedHeavyAttackCombo.Num())
@@ -717,7 +706,7 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 		//StopBuffer()
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
-		SoftLockOn(1000.0f);
+		SoftLockOn();
 		PlayAnimMontage(CurrentMontage);
 		StartAttackPausedTimer();
 		HeavyAttackIndex++;
