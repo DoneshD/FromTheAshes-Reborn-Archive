@@ -101,6 +101,7 @@ protected:
 
 	//Attack Strings
 	void PerformComboStarter();
+	void PerformComboExtender();
 
 	//Timed Attacks
 	void StartAttackPausedTimer();
@@ -154,6 +155,7 @@ private:
 	bool bHeavyAttackPaused;
 
 	//Combo Strings
+	int ComboStarterIndex = 0;
 	int ComboExtenderIndex = 0;
 
 	//Air attack
@@ -204,6 +206,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combo")
 	TArray<TObjectPtr<UAnimMontage>> ComboStarters;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combo")
+	TArray<TObjectPtr<UAnimMontage>> ComboExtenders;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
