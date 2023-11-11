@@ -543,6 +543,7 @@ void APlayableCharacter::SaveLightAttack()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bLightAttackSaved)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("bLightAttackSaved"));
 		bLightAttackSaved = false;
 		if (IsStateEqualToAny(MakeArray))
 		{
@@ -552,13 +553,16 @@ void APlayableCharacter::SaveLightAttack()
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT bLightAttackSaved"));
 		if (bHeavyAttackSaved && ComboExtenderIndex > 0)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved && ComboExtenderIndex > 0"));
+
 			if (IsStateEqualToAny(MakeArray))
 			{
 				SetState(EStates::EState_Nothing);
 			}
-			UE_LOG(LogTemp, Warning, TEXT("Here"));
+			UE_LOG(LogTemp, Warning, TEXT("Calling PerformComboExtender"));
 			PerformComboExtender();
 		}
 	}
