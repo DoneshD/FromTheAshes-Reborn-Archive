@@ -112,6 +112,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
 	void EndWeaponCollision();
 
+	bool WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLocation, FVector& EndLocation);
+
 	//Movement
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void EnableRootRotation();

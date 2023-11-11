@@ -39,7 +39,6 @@ void APlayableCharacter::BeginPlay()
 	if (RotationCurve)
 	{
 		Timeline->AddInterpFloat(RotationCurve, InterpFunction, FName("Alpha"));
-		//Timeline->SetTimelineFinishedFunc(TimelineFinished);
 		Timeline->SetTimelinePostUpdateFunc(TimelineFinished);
 
 		Timeline->SetLooping(false);
@@ -63,7 +62,7 @@ void APlayableCharacter::ResetHeavyAttack()
 	bHeavyAttackSaved = false;
 	bHeavyAttackPaused = false;
 
-	//TODO: Clear Timer by Function Name
+	ClearAttackPausedTimer();
 }
 
 void APlayableCharacter::ResetAirAttack()
@@ -119,6 +118,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 {
 
 	//------------------------------------------------------------ TICK::Targeting -----------------------------------------------------------------//
+
 	Super::Tick(DeltaTime);
 	if (bTargeting && HardTarget)
 	{
@@ -148,46 +148,14 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 	if (bActiveCollision)
 	{
-		TArray<FHitResult> LeftHits;
-		FVector StartLocation_L = GetMesh()->GetSocketLocation("Start_L");
-		FVector EndLocation_L = GetMesh()->GetSocketLocation("End_L");
+		TArray<FHitResult> Hits;
+		FVector StartLocation = GetMesh()->GetSocketLocation("Start_L");
+		FVector EndLocation = GetMesh()->GetSocketLocation("End_L");
 
-		TArray<FHitResult> RightHits;
-		FVector StartLocation_R = GetMesh()->GetSocketLocation("Start_R");
-		FVector EndLocation_R = GetMesh()->GetSocketLocation("End_R");
-
-		TArray<AActor*> ActorArray;
-		ActorArray.Add(this);
-
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-		bool bLeftHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
-			GetWorld(),
-			StartLocation_L,
-			EndLocation_L,
-			20.f,
-			ObjectTypes,
-			false,
-			ActorArray,
-			EDrawDebugTrace::None,
-			LeftHits,
-			true);
-
-		bool bRighttHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
-			GetWorld(),
-			StartLocation_R,
-			EndLocation_R,
-			20.f,
-			ObjectTypes,
-			false,
-			ActorArray,
-			EDrawDebugTrace::None,
-			RightHits,
-			true);
+		bool bLeftSuccess = WeaponTrace(Hits, StartLocation, EndLocation);
 
 		//Use INTERFACE
-		for (auto& CurrentHit : LeftHits)
+		for (auto& CurrentHit : Hits)
 		{
 			if (CurrentHit.GetActor())
 			{
@@ -201,7 +169,12 @@ void APlayableCharacter::Tick(float DeltaTime)
 			}
 		}
 
-		for (auto& CurrentHit : RightHits)
+		StartLocation = GetMesh()->GetSocketLocation("Start_R");
+		EndLocation = GetMesh()->GetSocketLocation("End_R");
+
+		bool bRightSuccess = WeaponTrace(Hits, StartLocation, EndLocation);
+		
+		for (auto& CurrentHit : Hits)
 		{
 			if (CurrentHit.GetActor())
 			{
@@ -308,6 +281,35 @@ void APlayableCharacter::OnTimelineFinished()
 	Timeline->Stop();
 }
 
+//------------------------------------------------------------- Weapon Trace -----------------------------------------------------------------//
+
+bool APlayableCharacter::WeaponTrace(TArray<FHitResult> &Hit, FVector &StartLocation, FVector &EndLocation)
+{
+	TArray<AActor*> ActorArray;
+	ActorArray.Add(this);
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+
+	bool bHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		GetWorld(),
+		StartLocation,
+		EndLocation,
+		20.f,
+		ObjectTypes,
+		false,
+		ActorArray,
+		EDrawDebugTrace::ForDuration,
+		Hit,
+		true);
+
+	return bHit;
+}
+
 //------------------------------------------------------------- LockOn -----------------------------------------------------------------//
 
 
@@ -318,11 +320,7 @@ void APlayableCharacter::StopRotation()
 
 void APlayableCharacter::RotationToTarget()
 {
-	//if (SoftTarget)
-	//{
-		//TODO
 		Timeline->PlayFromStart();
-	//}
 }
 
 void APlayableCharacter::SoftLockOn(float Distance)
