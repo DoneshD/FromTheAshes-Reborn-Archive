@@ -60,7 +60,6 @@ protected:
 	void ResetAirAttack();
 	void ResetDodge();
 
-
 	//FSM Attack Check
 	bool CanAttack();
 	bool CanDodge();
@@ -97,9 +96,11 @@ protected:
 	void SelectHeavyCombo();
 	void NewHeavyCombo();
 	void PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
-
 	UFUNCTION()
 	void HeavyAttackPaused();
+
+	//Attack Strings
+	void PerformComboStarter();
 
 	//Timed Attacks
 	void StartAttackPausedTimer();
@@ -108,10 +109,8 @@ protected:
 	//Weapon Collision
 	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
 	void StartWeaponCollision();
-
 	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
 	void EndWeaponCollision();
-
 	bool WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLocation, FVector& EndLocation);
 
 	//Movement
@@ -121,7 +120,6 @@ protected:
 	//LockOn
 	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();
-
 	void StopRotation();
 
 	void SoftLockOn(float Distance);
@@ -155,6 +153,9 @@ private:
 	bool bHeavyAttackSaved;
 	bool bHeavyAttackPaused;
 
+	//Combo Strings
+	int ComboExtenderIndex = 0;
+
 	//Air attack
 	int AirComboIndex;
 	bool bLaunched;
@@ -170,23 +171,25 @@ private:
 	FOnAttackPausedEvent OnAttackPausedEvent;
 	//Execution
 	bool bExecuting;
-
 	TMap<int, int> YCardinalMapping;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> HeavyAttackCombo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo1;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardDodgeAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> BackDodgeAnim;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardRollAnim;
 
@@ -198,6 +201,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combo")
+	TArray<TObjectPtr<UAnimMontage>> ComboStarters;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

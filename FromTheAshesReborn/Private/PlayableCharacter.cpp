@@ -281,9 +281,20 @@ void APlayableCharacter::OnTimelineFinished()
 	Timeline->Stop();
 }
 
-//------------------------------------------------------------- Weapon Trace -----------------------------------------------------------------//
+//------------------------------------------------------------ Weapon Collisions -----------------------------------------------------------------//
 
-bool APlayableCharacter::WeaponTrace(TArray<FHitResult> &Hit, FVector &StartLocation, FVector &EndLocation)
+void APlayableCharacter::StartWeaponCollision()
+{
+	AlreadyHitActors_L.Empty();
+	AlreadyHitActors_R.Empty();
+	bActiveCollision = true;
+}
+void APlayableCharacter::EndWeaponCollision()
+{
+	bActiveCollision = false;
+}
+
+bool APlayableCharacter::WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLocation, FVector& EndLocation)
 {
 	TArray<AActor*> ActorArray;
 	ActorArray.Add(this);
@@ -303,7 +314,7 @@ bool APlayableCharacter::WeaponTrace(TArray<FHitResult> &Hit, FVector &StartLoca
 		ObjectTypes,
 		false,
 		ActorArray,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		Hit,
 		true);
 
@@ -311,7 +322,6 @@ bool APlayableCharacter::WeaponTrace(TArray<FHitResult> &Hit, FVector &StartLoca
 }
 
 //------------------------------------------------------------- LockOn -----------------------------------------------------------------//
-
 
 void APlayableCharacter::StopRotation()
 {
@@ -411,71 +421,6 @@ void APlayableCharacter::HardLockOn()
 		HardTarget = NULL;
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
-}
-
-//------------------------------------------------------------ Weapon Collisions -----------------------------------------------------------------//
-
-void APlayableCharacter::StartWeaponCollision()
-{
-	AlreadyHitActors_L.Empty();
-	AlreadyHitActors_R.Empty();
-	bActiveCollision = true;
-}
-void APlayableCharacter::EndWeaponCollision()
-{
-	bActiveCollision = false;
-}
-
-//---------------------------------------------------------- Attack Saves -----------------------------------------------------------------//
-
-void APlayableCharacter::SaveLightAttack()
-{
-	if (bLightAttackSaved)
-	{
-		bLightAttackSaved = false;
-		TArray<EStates> MakeArray = { EStates::EState_Attack };
-		if (IsStateEqualToAny(MakeArray))
-		{
-			SetState(EStates::EState_Nothing);
-		}
-		LightAttack();
-	}
-}
-
-void APlayableCharacter::SaveHeavyAttack()
-{
-	if (bHeavyAttackSaved)
-	{
-		bHeavyAttackSaved = false;
-		//Air Slam()
-		TArray<EStates> MakeArray = { EStates::EState_Attack };
-		if (IsStateEqualToAny(MakeArray))
-		{
-			SetState(EStates::EState_Nothing);
-		}
-		//Perform pause combo or regular
-		if (bHeavyAttackPaused)
-		{
-			NewHeavyCombo();
-		}
-		HeavyAttack();
-	}
-}
-
-void APlayableCharacter::StartAttackPausedTimer()
-{
-	GetWorldTimerManager().SetTimer(AttackPauseHandle, this, &APlayableCharacter::HeavyAttackPaused, .8, true);
-}
-
-void APlayableCharacter::ClearAttackPausedTimer()
-{
-	GetWorldTimerManager().ClearTimer(AttackPauseHandle);
-}
-
-void APlayableCharacter::HeavyAttackPaused()
-{
-	bHeavyAttackPaused = true;
-	OnAttackPausedEvent.Broadcast();
 }
 
 //------------------------------------------------------------ Dodge -----------------------------------------------------------------//
@@ -589,6 +534,70 @@ void APlayableCharacter::Dodge()
 	{
 		bDodgeSaved = true;
 	}
+}
+
+//---------------------------------------------------------- Attack Saves -----------------------------------------------------------------//
+
+void APlayableCharacter::SaveLightAttack()
+{
+	if (bLightAttackSaved)
+	{
+		bLightAttackSaved = false;
+		TArray<EStates> MakeArray = { EStates::EState_Attack };
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Nothing);
+		}
+		LightAttack();
+	}
+}
+
+void APlayableCharacter::SaveHeavyAttack()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack };
+	if (bHeavyAttackSaved)
+	{
+		bHeavyAttackSaved = false;
+		//Air Slam()
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Nothing);
+		}
+		//Perform pause combo or regular
+		if (bHeavyAttackPaused)
+		{
+			NewHeavyCombo();
+		}
+		HeavyAttack();
+	}
+	else
+	{
+		if (bLightAttackSaved && HeavyAttackIndex > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Here"));
+			if (IsStateEqualToAny(MakeArray))
+			{
+				SetState(EStates::EState_Nothing);
+			}
+			PerformComboStarter();
+		}
+	}
+}
+
+void APlayableCharacter::StartAttackPausedTimer()
+{
+	GetWorldTimerManager().SetTimer(AttackPauseHandle, this, &APlayableCharacter::HeavyAttackPaused, .8, true);
+}
+
+void APlayableCharacter::ClearAttackPausedTimer()
+{
+	GetWorldTimerManager().ClearTimer(AttackPauseHandle);
+}
+
+void APlayableCharacter::HeavyAttackPaused()
+{
+	bHeavyAttackPaused = true;
+	OnAttackPausedEvent.Broadcast();
 }
 
 //------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
@@ -746,4 +755,35 @@ void APlayableCharacter::InputHeavyAttack()
 	{
 		HeavyAttack();
 	}
+}
+
+//--------------------------------------------------------- Combo Strings -----------------------------------------------------------------//
+
+void APlayableCharacter::PerformComboStarter()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
+	if (!IsStateEqualToAny(MakeArray))
+	{
+		UAnimMontage* CurrentMontage = ComboStarters[HeavyAttackIndex - 1];
+		if (CurrentMontage)
+		{
+			HeavyAttackIndex = ComboExtenderIndex;
+			//StopBuffer()
+			//StartBuffer();
+			bHeavyAttackSaved = false;
+			bLightAttackSaved = false;
+			SetState(EStates::EState_Attack);
+			SoftLockOn(500.0f);
+			PlayAnimMontage(CurrentMontage);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
+		}
+	}
+	else
+	{
+		return;
+	}
+
 }
