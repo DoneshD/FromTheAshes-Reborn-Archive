@@ -155,7 +155,6 @@ private:
 	bool bHeavyAttackPaused;
 
 	//Combo Strings
-	int ComboStarterIndex = 0;
 	int ComboExtenderIndex = 0;
 
 	//Air attack

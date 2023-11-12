@@ -554,7 +554,7 @@ void APlayableCharacter::SaveLightAttack()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NOT bLightAttackSaved"));
-		if (bHeavyAttackSaved && ComboExtenderIndex > 0)
+		if (bHeavyAttackSaved)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved && ComboExtenderIndex > 0"));
 
@@ -573,6 +573,7 @@ void APlayableCharacter::SaveHeavyAttack()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bHeavyAttackSaved)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved"));
 		bHeavyAttackSaved = false;
 		//Air Slam()
 		if (IsStateEqualToAny(MakeArray))
@@ -588,12 +589,16 @@ void APlayableCharacter::SaveHeavyAttack()
 	}
 	else
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("NOT bHeavyAttackSaved"));
 		if (bLightAttackSaved && HeavyAttackIndex > 0)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("bLightAttackSaved && HeavyAttackIndex > 0"));
+
 			if (IsStateEqualToAny(MakeArray))
 			{
 				SetState(EStates::EState_Nothing);
 			}
+			UE_LOG(LogTemp, Warning, TEXT("Calling PerformStarter"));
 			PerformComboStarter();
 		}
 	}
@@ -710,6 +715,7 @@ void APlayableCharacter::NewHeavyCombo()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if(!IsStateEqualToAny(MakeArray))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Calling SelectHeavyCombo"));
 		SelectHeavyCombo();
 	}
 }
@@ -746,6 +752,7 @@ void APlayableCharacter::HeavyAttack()
 		ClearAttackPausedTimer();
 		bHeavyAttackPaused = false;
 		ResetLightAttack();
+		UE_LOG(LogTemp, Warning, TEXT("Calling PerformHeavyAttack"));
 		PerformHeavyAttack(HeavyAttackIndex);
 	}
 	else
@@ -779,7 +786,7 @@ void APlayableCharacter::PerformComboStarter()
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
 	{
-		UAnimMontage* CurrentMontage = ComboStarters[HeavyAttackIndex - 1];
+		UAnimMontage* CurrentMontage = ComboStarters[HeavyAttackIndex];
 		if (CurrentMontage)
 		{
 			HeavyAttackIndex = ComboExtenderIndex;
@@ -807,7 +814,7 @@ void APlayableCharacter::PerformComboExtender()
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
 	{
-		UAnimMontage* CurrentMontage = ComboExtenders[ComboExtenderIndex - 1];
+		UAnimMontage* CurrentMontage = ComboExtenders[ComboExtenderIndex];
 		if (CurrentMontage)
 		{
 			ResetLightAttack();
