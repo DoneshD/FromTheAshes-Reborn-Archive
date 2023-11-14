@@ -159,7 +159,7 @@ private:
 	//Combo Strings
 	int ComboExtenderIndex = 0;
 	int ComboSurgeCount = 0;
-	float ComboSurgeSpeed = 0.02;
+	float ComboSurgeSpeed = 1.2;
 
 
 	//Air attack

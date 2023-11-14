@@ -83,7 +83,7 @@ void APlayableCharacter::ResetCombos()
 	HeavyAttackIndex = 0;
 	ComboExtenderIndex = 0;
 	ComboSurgeCount = 0;
-	ComboSurgeSpeed = 0.02;
+	ComboSurgeSpeed = 1.2;
 }
 
 void APlayableCharacter::ResetState()
@@ -865,19 +865,34 @@ void APlayableCharacter::PerformComboSurge()
 		ResetLightAttack();
 		ResetHeavyAttack();
 		SetState(EStates::EState_Attack);
+		UE_LOG(LogTemp, Warning, TEXT("ComboSurgeCount: %d: "), ComboSurgeCount);
+
 		if (ComboSurgeCount % 2 == 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Even"));
-			PlayAnimMontage(ComboSurge_L, 1 + ComboSurgeSpeed);
-			ComboSurgeSpeed += ComboSurgeSpeed;
+			PlayAnimMontage(ComboSurge_L, ComboSurgeSpeed);
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Odd"));
-			PlayAnimMontage(ComboSurge_R, 1 + ComboSurgeSpeed);
-			ComboSurgeSpeed += ComboSurgeSpeed;
+			PlayAnimMontage(ComboSurge_R, ComboSurgeSpeed);
 		}
 		ComboSurgeCount += 1;
+		if (ComboSurgeCount > 7)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("First"));
+			ComboSurgeSpeed += .05;
+		}
+		else if (ComboSurgeCount > 5)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Second"));
+			ComboSurgeSpeed += .02;
+		}
+		else if (ComboSurgeCount > 3)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Third"));
+			ComboSurgeSpeed += .01;
+		}
 	}
 	else
 	{
