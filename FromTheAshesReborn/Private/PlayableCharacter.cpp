@@ -78,6 +78,14 @@ void APlayableCharacter::ResetDodge()
 	bCanDodge = true;
 }
 
+void APlayableCharacter::ResetCombos()
+{
+	HeavyAttackIndex = 0;
+	ComboExtenderIndex = 0;
+	ComboSurgeCount = 0;
+	ComboSurgeSpeed = 0.02;
+}
+
 void APlayableCharacter::ResetState()
 {
 	if (GetCharacterMovement()->IsFalling())
@@ -96,6 +104,7 @@ void APlayableCharacter::ResetState()
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ClearAttackPausedTimer();
+	ResetCombos();
 
 	SetState(EStates::EState_Nothing);
 }
@@ -544,26 +553,34 @@ void APlayableCharacter::SaveLightAttack()
 	if (bLightAttackSaved)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("bLightAttackSaved"));
+		UE_LOG(LogTemp, Warning, TEXT("ComboExtenderIndex: %f"), ComboSurgeCount);
 		bLightAttackSaved = false;
 		if (IsStateEqualToAny(MakeArray))
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		LightAttack();
+		if (ComboSurgeCount > 0)
+		{
+			PerformComboSurge();
+		}
+		else
+		{
+			LightAttack();
+		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NOT bLightAttackSaved"));
+		//UE_LOG(LogTemp, Warning, TEXT("NOT bLightAttackSaved"));
 		if (bHeavyAttackSaved)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved && ComboExtenderIndex > 0"));
+			//UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved && ComboExtenderIndex > 0"));
 
 			if (IsStateEqualToAny(MakeArray))
 			{
 				SetState(EStates::EState_Nothing);
 			}
-			UE_LOG(LogTemp, Warning, TEXT("Calling PerformComboExtender"));
-			PerformComboExtender();
+			//UE_LOG(LogTemp, Warning, TEXT("Calling PerformComboExtender"));
+			//PerformComboExtender();
 		}
 	}
 }
@@ -573,7 +590,7 @@ void APlayableCharacter::SaveHeavyAttack()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bHeavyAttackSaved)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved"));
+		//UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved"));
 		bHeavyAttackSaved = false;
 		//Air Slam()
 		if (IsStateEqualToAny(MakeArray))
@@ -592,14 +609,14 @@ void APlayableCharacter::SaveHeavyAttack()
 		//UE_LOG(LogTemp, Warning, TEXT("NOT bHeavyAttackSaved"));
 		if (bLightAttackSaved && HeavyAttackIndex > 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("bLightAttackSaved && HeavyAttackIndex > 0"));
+			//UE_LOG(LogTemp, Warning, TEXT("bLightAttackSaved && HeavyAttackIndex > 0"));
 
 			if (IsStateEqualToAny(MakeArray))
 			{
 				SetState(EStates::EState_Nothing);
 			}
-			UE_LOG(LogTemp, Warning, TEXT("Calling PerformStarter"));
-			PerformComboStarter();
+			UE_LOG(LogTemp, Warning, TEXT("Calling PerformSurge"));
+			PerformComboSurge();
 		}
 	}
 }
@@ -781,12 +798,41 @@ void APlayableCharacter::InputHeavyAttack()
 
 //--------------------------------------------------------- Combo Strings -----------------------------------------------------------------//
 
+void APlayableCharacter::PerformComboExtender()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
+	if (!IsStateEqualToAny(MakeArray))
+	{
+		UAnimMontage* CurrentMontage = ComboExtenders[ComboExtenderIndex - 1];
+		if (CurrentMontage)
+		{
+			ResetLightAttack();
+			ResetHeavyAttack();
+			//StopBuffer()
+			//StartBuffer();
+			ComboExtenderIndex += 1;
+			bHeavyAttackSaved = false;
+			SetState(EStates::EState_Attack);
+			SoftLockOn(500.0f);
+			PlayAnimMontage(CurrentMontage);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
+		}
+	}
+	else
+	{
+		return;
+	}
+}
+
 void APlayableCharacter::PerformComboStarter()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
 	{
-		UAnimMontage* CurrentMontage = ComboStarters[HeavyAttackIndex];
+		UAnimMontage* CurrentMontage = ComboStarters[HeavyAttackIndex - 1];
 		if (CurrentMontage)
 		{
 			HeavyAttackIndex = ComboExtenderIndex;
@@ -809,27 +855,29 @@ void APlayableCharacter::PerformComboStarter()
 	}
 }
 
-void APlayableCharacter::PerformComboExtender()
+
+
+void APlayableCharacter::PerformComboSurge()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
 	{
-		UAnimMontage* CurrentMontage = ComboExtenders[ComboExtenderIndex];
-		if (CurrentMontage)
+		ResetLightAttack();
+		ResetHeavyAttack();
+		SetState(EStates::EState_Attack);
+		if (ComboSurgeCount % 2 == 0)
 		{
-			ResetLightAttack();
-			ResetHeavyAttack();
-			//StopBuffer()
-			//StartBuffer();
-			bHeavyAttackSaved = false;
-			SetState(EStates::EState_Attack);
-			SoftLockOn(500.0f);
-			PlayAnimMontage(CurrentMontage);
+			UE_LOG(LogTemp, Warning, TEXT("Even"));
+			PlayAnimMontage(ComboSurge_L, 1 + ComboSurgeSpeed);
+			ComboSurgeSpeed += ComboSurgeSpeed;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
+			UE_LOG(LogTemp, Warning, TEXT("Odd"));
+			PlayAnimMontage(ComboSurge_R, 1 + ComboSurgeSpeed);
+			ComboSurgeSpeed += ComboSurgeSpeed;
 		}
+		ComboSurgeCount += 1;
 	}
 	else
 	{

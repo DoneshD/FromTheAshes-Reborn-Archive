@@ -59,6 +59,7 @@ protected:
 	void ResetHeavyAttack();
 	void ResetAirAttack();
 	void ResetDodge();
+	void ResetCombos();
 
 	//FSM Attack Check
 	bool CanAttack();
@@ -102,6 +103,7 @@ protected:
 	//Attack Strings
 	void PerformComboStarter();
 	void PerformComboExtender();
+	void PerformComboSurge();
 
 	//Timed Attacks
 	void StartAttackPausedTimer();
@@ -156,6 +158,9 @@ private:
 
 	//Combo Strings
 	int ComboExtenderIndex = 0;
+	int ComboSurgeCount = 0;
+	float ComboSurgeSpeed = 0.02;
+
 
 	//Air attack
 	int AirComboIndex;
@@ -182,9 +187,21 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo1;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Combo")
+	TArray<TObjectPtr<UAnimMontage>> ComboStarters;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combo")
+	TArray<TObjectPtr<UAnimMontage>> ComboExtenders;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Surge")
+	TObjectPtr<UAnimMontage> ComboSurge_L;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Surge")
+	TObjectPtr<UAnimMontage> ComboSurge_R;
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardDodgeAnim;
 
@@ -203,11 +220,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Combo")
-	TArray<TObjectPtr<UAnimMontage>> ComboStarters;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Combo")
-	TArray<TObjectPtr<UAnimMontage>> ComboExtenders;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
