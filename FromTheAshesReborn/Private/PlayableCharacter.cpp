@@ -365,7 +365,7 @@ void APlayableCharacter::SoftLockOn(float Distance)
 			ObjectTypes, 
 			false, 
 			ActorArray, 
-			EDrawDebugTrace::ForDuration, 
+			EDrawDebugTrace::None, 
 			OutHit, 
 			true);
 
@@ -558,9 +558,14 @@ void APlayableCharacter::SaveLightAttack()
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		if (ComboSurgeCount > 0)
+		if (ComboSurgeCount > 0 && HeavyAttackIndex < 1)
 		{
 			PerformComboSurge();
+		}
+		else if (HeavyAttackIndex > 1)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PerformComboExtender()"));
+			PerformComboExtender();
 		}
 		else
 		{
@@ -569,7 +574,7 @@ void APlayableCharacter::SaveLightAttack()
 	}
 	else
 	{
-		if (bHeavyAttackSaved && ComboExtenderIndex > 0)
+		if (bHeavyAttackSaved && HeavyAttackIndex > 1)
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved && ComboExtenderIndex > 0"));
 
@@ -577,8 +582,7 @@ void APlayableCharacter::SaveLightAttack()
 			{
 				SetState(EStates::EState_Nothing);
 			}
-			UE_LOG(LogTemp, Warning, TEXT("PerformComboExtender()"));
-			//PerformComboExtender();
+			//Combo Extender for Light -> Heavy
 		}
 	}
 }
@@ -601,7 +605,6 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			NewHeavyCombo();
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Greetings44"));
 
 		HeavyAttack();
 	}
@@ -645,8 +648,6 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(250.0f);
-		UE_LOG(LogTemp, Warning, TEXT("Greetings3"));
-
 		PlayAnimMontage(CurrentMontage);
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
@@ -667,8 +668,6 @@ void APlayableCharacter::LightAttack()
 		//CanLaunch()
 		//DodgeAttacks() SHOULD REFACTOR
 		ResetHeavyAttack();
-		UE_LOG(LogTemp, Warning, TEXT("Greetings2"));
-
 		PerformLightAttack(LightAttackIndex);
 	}
 	else
@@ -691,7 +690,6 @@ void APlayableCharacter::InputLightAttack()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Greetings"));
 		LightAttack();
 	}
 }
@@ -724,10 +722,10 @@ void APlayableCharacter::SelectHeavyCombo()
 	{
 		PerformHeavyCombo(PausedHeavyAttackCombo1);
 	}
-	if (HeavyAttackIndex == 2)
-	{
-		PerformHeavyCombo(PausedHeavyAttackCombo2);
-	}
+	//if (HeavyAttackIndex == 2)
+	//{
+	//	PerformHeavyCombo(PausedHeavyAttackCombo2);
+	//}
 }
 void APlayableCharacter::NewHeavyCombo()
 {
@@ -803,18 +801,16 @@ void APlayableCharacter::PerformComboExtender()
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
 	{
-		UAnimMontage* CurrentMontage = ComboExtenders[ComboExtenderIndex - 1];
-		if (CurrentMontage)
+		if (ComboBybass)
 		{
 			ResetLightAttack();
 			ResetHeavyAttack();
 			//StopBuffer()
 			//StartBuffer();
-			ComboExtenderIndex += 1;
 			bHeavyAttackSaved = false;
 			SetState(EStates::EState_Attack);
 			SoftLockOn(500.0f);
-			PlayAnimMontage(CurrentMontage);
+			PlayAnimMontage(ComboBybass);
 		}
 		else
 		{
@@ -826,36 +822,6 @@ void APlayableCharacter::PerformComboExtender()
 		return;
 	}
 }
-
-void APlayableCharacter::PerformComboStarter()
-{
-	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
-	if (!IsStateEqualToAny(MakeArray))
-	{
-		UAnimMontage* CurrentMontage = ComboStarters[HeavyAttackIndex - 1];
-		if (CurrentMontage)
-		{
-			HeavyAttackIndex = ComboExtenderIndex;
-			//StopBuffer()
-			//StartBuffer();
-			bHeavyAttackSaved = false;
-			bLightAttackSaved = false;
-			SetState(EStates::EState_Attack);
-			SoftLockOn(500.0f);
-			PlayAnimMontage(CurrentMontage);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
-		}
-	}
-	else
-	{
-		return;
-	}
-}
-
-
 
 void APlayableCharacter::PerformComboSurge()
 {
@@ -866,6 +832,7 @@ void APlayableCharacter::PerformComboSurge()
 		ResetLightAttack();
 		ResetHeavyAttack();
 		SetState(EStates::EState_Attack);
+		SoftLockOn(500.0f);
 
 		PlayAnimMontage((ComboSurgeCount % 2 == 0) ? ComboSurge_L : ComboSurge_R, ComboSurgeSpeed);
 		ComboSurgeCount += 1;

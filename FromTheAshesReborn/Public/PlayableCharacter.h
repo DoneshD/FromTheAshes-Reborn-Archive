@@ -101,7 +101,6 @@ protected:
 	void HeavyAttackPaused();
 
 	//Attack Strings
-	void PerformComboStarter();
 	void PerformComboExtender();
 	void PerformComboSurge();
 
@@ -200,8 +199,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Surge")
 	TObjectPtr<UAnimMontage> ComboSurge_L;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Bybass")
+	TObjectPtr<UAnimMontage> ComboBybass;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Surge")
 	TObjectPtr<UAnimMontage> ComboSurge_R;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardDodgeAnim;
 
