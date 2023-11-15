@@ -861,14 +861,19 @@ void APlayableCharacter::PerformComboSurge()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 
-	if (IsStateEqualToAny(MakeArray)) return;
+	if (!IsStateEqualToAny(MakeArray))
+	{
+		ResetLightAttack();
+		ResetHeavyAttack();
+		SetState(EStates::EState_Attack);
 
-	ResetLightAttack();
-	ResetHeavyAttack();
-	SetState(EStates::EState_Attack);
-
-	PlayAnimMontage((ComboSurgeCount % 2 == 0) ? ComboSurge_L : ComboSurge_R, ComboSurgeSpeed);
-	ComboSurgeCount += 1;
-	ComboSurgeSpeed = (ComboSurgeCount > 5) ? 1.5 : (ComboSurgeCount > 2) ? 1.3 : 1.2;
+		PlayAnimMontage((ComboSurgeCount % 2 == 0) ? ComboSurge_L : ComboSurge_R, ComboSurgeSpeed);
+		ComboSurgeCount += 1;
+		ComboSurgeSpeed = (ComboSurgeCount > 5) ? 1.5 : (ComboSurgeCount > 2) ? 1.3 : 1.2;
+	}
+	else
+	{
+		return;
+	}
 
 }
