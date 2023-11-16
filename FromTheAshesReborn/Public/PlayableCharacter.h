@@ -94,14 +94,14 @@ protected:
 	void SaveHeavyAttack();
 
 	//Heavy Combos
-	void SelectHeavyCombo();
+	void SelectHeavyPauseCombo();
 	void NewHeavyCombo();
-	void PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
+	void PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
 	UFUNCTION()
 	void HeavyAttackPaused();
 
 	//Attack Strings
-	void PerformComboExtender();
+	void PerformComboFinisher();
 	void PerformComboSurge();
 
 	//Timed Attacks

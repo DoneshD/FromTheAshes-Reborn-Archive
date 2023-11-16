@@ -552,40 +552,65 @@ void APlayableCharacter::SaveLightAttack()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bLightAttackSaved)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bLightAttackSaved"));
 		bLightAttackSaved = false;
 		if (IsStateEqualToAny(MakeArray))
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		if (ComboSurgeCount > 0 && HeavyAttackIndex < 1)
+		if (ComboSurgeCount > 0 && HeavyAttackIndex == 1)
 		{
 			PerformComboSurge();
 		}
 		else if (HeavyAttackIndex > 1)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PerformComboExtender()"));
-			PerformComboExtender();
+			PerformComboFinisher();
 		}
 		else
 		{
 			LightAttack();
 		}
 	}
-	else
-	{
-		if (bHeavyAttackSaved && HeavyAttackIndex > 1)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved && ComboExtenderIndex > 0"));
 
+}
+
+/*
+void APlayableCharacter::SaveHeavyAttack()
+{
+	TArray<EStates> MakeArray = { EStates::EState_Attack };
+	if (bHeavyAttackSaved)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved"));
+
+		bHeavyAttackSaved = false;
+		//Air Slam()
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Nothing);
+		}
+		//Perform pause combo or regular
+		if (bHeavyAttackPaused)
+		{
+			NewHeavyCombo();
+		}
+		else if (bLightAttackSaved && HeavyAttackIndex == 1)
+		{
 			if (IsStateEqualToAny(MakeArray))
 			{
 				SetState(EStates::EState_Nothing);
 			}
-			//Combo Extender for Light -> Heavy
+			PerformComboSurge();
+		}
+		else if (LightAttackIndex == 2)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("New Combo!!!"));
+		}
+		else
+		{
+			HeavyAttack();
 		}
 	}
 }
+*/
 
 void APlayableCharacter::SaveHeavyAttack()
 {
@@ -605,19 +630,24 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			NewHeavyCombo();
 		}
-
-		HeavyAttack();
-	}
-	else
-	{
-		if (bLightAttackSaved && HeavyAttackIndex < 2)
+		else if (LightAttackIndex == 2)
 		{
-			if (IsStateEqualToAny(MakeArray))
-			{
-				SetState(EStates::EState_Nothing);
-			}
-			PerformComboSurge();
+			UE_LOG(LogTemp, Warning, TEXT("New Combo!!!"));
 		}
+		else
+		{
+			HeavyAttack();
+		}
+	}
+	else if (bLightAttackSaved && HeavyAttackIndex == 1)
+	{
+		if (IsStateEqualToAny(MakeArray))
+		{
+			SetState(EStates::EState_Nothing);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Here"));
+
+		PerformComboSurge();
 	}
 }
 
@@ -696,7 +726,7 @@ void APlayableCharacter::InputLightAttack()
 
 //--------------------------------------------------------- Heavy Attack Actions -----------------------------------------------------------------//
 
-void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo)
+void APlayableCharacter::PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo)
 {
 	UAnimMontage* AttackMontage = PausedHeavyAttackCombo[NewHeavyAttackIndex];
 	if (AttackMontage)
@@ -716,11 +746,11 @@ void APlayableCharacter::PerformHeavyCombo(TArray<TObjectPtr<UAnimMontage>> Paus
 }
 
 //TODO: Select combo for scalability
-void APlayableCharacter::SelectHeavyCombo()
+void APlayableCharacter::SelectHeavyPauseCombo()
 {
 	if (HeavyAttackIndex == 1)
 	{
-		PerformHeavyCombo(PausedHeavyAttackCombo1);
+		PerformHeavyPauseCombo(PausedHeavyAttackCombo1);
 	}
 	//if (HeavyAttackIndex == 2)
 	//{
@@ -732,7 +762,7 @@ void APlayableCharacter::NewHeavyCombo()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if(!IsStateEqualToAny(MakeArray))
 	{
-		SelectHeavyCombo();
+		SelectHeavyPauseCombo();
 	}
 }
 
@@ -796,7 +826,7 @@ void APlayableCharacter::InputHeavyAttack()
 
 //--------------------------------------------------------- Combo Strings -----------------------------------------------------------------//
 
-void APlayableCharacter::PerformComboExtender()
+void APlayableCharacter::PerformComboFinisher()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
