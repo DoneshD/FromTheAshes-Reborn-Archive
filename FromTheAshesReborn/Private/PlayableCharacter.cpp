@@ -573,13 +573,11 @@ void APlayableCharacter::SaveLightAttack()
 
 }
 
-/*
 void APlayableCharacter::SaveHeavyAttack()
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bHeavyAttackSaved)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved"));
 
 		bHeavyAttackSaved = false;
 		//Air Slam()
@@ -587,52 +585,13 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		//Perform pause combo or regular
-		if (bHeavyAttackPaused)
-		{
-			NewHeavyCombo();
-		}
-		else if (bLightAttackSaved && HeavyAttackIndex == 1)
-		{
-			if (IsStateEqualToAny(MakeArray))
-			{
-				SetState(EStates::EState_Nothing);
-			}
-			PerformComboSurge();
-		}
-		else if (LightAttackIndex == 2)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("New Combo!!!"));
-		}
-		else
-		{
-			HeavyAttack();
-		}
-	}
-}
-*/
-
-void APlayableCharacter::SaveHeavyAttack()
-{
-	TArray<EStates> MakeArray = { EStates::EState_Attack };
-	if (bHeavyAttackSaved)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("bHeavyAttackSaved"));
-
-		bHeavyAttackSaved = false;
-		//Air Slam()
-		if (IsStateEqualToAny(MakeArray))
-		{
-			SetState(EStates::EState_Nothing);
-		}
-		//Perform pause combo or regular
 		if (bHeavyAttackPaused)
 		{
 			NewHeavyCombo();
 		}
 		else if (LightAttackIndex == 2)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("New Combo!!!"));
+			PerformComboExtender();
 		}
 		else
 		{
@@ -645,8 +604,6 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			SetState(EStates::EState_Nothing);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Here"));
-
 		PerformComboSurge();
 	}
 }
@@ -825,6 +782,25 @@ void APlayableCharacter::InputHeavyAttack()
 }
 
 //--------------------------------------------------------- Combo Strings -----------------------------------------------------------------//
+
+void APlayableCharacter::PerformComboExtender()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Yur"));
+	UAnimMontage* CurrentMontage = ComboExtender[0];
+	if (CurrentMontage)
+	{
+		//StopBuffer()
+		//StartBuffer();
+		SetState(EStates::EState_Attack);
+		SoftLockOn(500.0f);
+		PlayAnimMontage(CurrentMontage);
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Montage"));
+	}
+}
 
 void APlayableCharacter::PerformComboFinisher()
 {

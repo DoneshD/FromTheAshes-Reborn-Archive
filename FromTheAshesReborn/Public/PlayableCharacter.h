@@ -101,6 +101,7 @@ protected:
 	void HeavyAttackPaused();
 
 	//Attack Strings
+	void PerformComboExtender();
 	void PerformComboFinisher();
 	void PerformComboSurge();
 
@@ -185,16 +186,13 @@ private:
 	TArray<TObjectPtr<UAnimMontage>> HeavyAttackCombo;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
+	TArray<TObjectPtr<UAnimMontage>> ComboExtender;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo2;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Combo")
-	TArray<TObjectPtr<UAnimMontage>> ComboStarters;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Combo")
-	TArray<TObjectPtr<UAnimMontage>> ComboExtenders;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Surge")
 	TObjectPtr<UAnimMontage> ComboSurge_L;
