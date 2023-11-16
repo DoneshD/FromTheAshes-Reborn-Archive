@@ -101,7 +101,7 @@ protected:
 	void HeavyAttackPaused();
 
 	//Attack Strings
-	void PerformComboExtender();
+	void PerformComboExtender(int ComboExtenderIndex);
 	void PerformComboFinisher();
 	void PerformComboSurge();
 

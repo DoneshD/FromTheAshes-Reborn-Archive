@@ -565,6 +565,11 @@ void APlayableCharacter::SaveLightAttack()
 		{
 			PerformComboFinisher();
 		}
+		else if (ComboExtenderIndex > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Light"));
+			PerformComboExtender(ComboExtenderIndex);
+		}
 		else
 		{
 			LightAttack();
@@ -591,7 +596,8 @@ void APlayableCharacter::SaveHeavyAttack()
 		}
 		else if (LightAttackIndex == 2)
 		{
-			PerformComboExtender();
+			UE_LOG(LogTemp, Warning, TEXT("Heavy"));
+			PerformComboExtender(ComboExtenderIndex);
 		}
 		else
 		{
@@ -783,18 +789,18 @@ void APlayableCharacter::InputHeavyAttack()
 
 //--------------------------------------------------------- Combo Strings -----------------------------------------------------------------//
 
-void APlayableCharacter::PerformComboExtender()
+void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Yur"));
-	UAnimMontage* CurrentMontage = ComboExtender[0];
+	UAnimMontage* CurrentMontage = ComboExtender[ExtenderIndex];
 	if (CurrentMontage)
 	{
 		//StopBuffer()
 		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(500.0f);
+		ComboExtenderIndex++;
 		PlayAnimMontage(CurrentMontage);
-		
 	}
 	else
 	{
@@ -813,7 +819,6 @@ void APlayableCharacter::PerformComboFinisher()
 			ResetHeavyAttack();
 			//StopBuffer()
 			//StartBuffer();
-			bHeavyAttackSaved = false;
 			SetState(EStates::EState_Attack);
 			SoftLockOn(500.0f);
 			PlayAnimMontage(ComboBybass);
@@ -836,7 +841,6 @@ void APlayableCharacter::PerformComboSurge()
 	if (!IsStateEqualToAny(MakeArray))
 	{
 		ResetLightAttack();
-		ResetHeavyAttack();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(500.0f);
 
