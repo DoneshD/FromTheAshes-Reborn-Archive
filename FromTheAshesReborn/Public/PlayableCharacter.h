@@ -31,15 +31,14 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 {
 	GENERATED_BODY()
 
-	
 protected:
-	//Constructor
+	//-----------------------------------------Constructor------------------------------------------
 	APlayableCharacter();
 
-	//BeginPlay
+	//-----------------------------------------BeginPlay--------------------------------------------
 	virtual void BeginPlay() override;
 
-	//Inputs
+	//-----------------------------------------Inputs-----------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LightAttack;
 
@@ -52,20 +51,68 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LockOn;
 
-	//FSM Reset States
+	//-----------------------------------------FSM Reset States-------------------------------------
 	UFUNCTION(BlueprintCallable, Category = "FSM")
 	void ResetState();
+
 	void ResetLightAttack();
 	void ResetHeavyAttack();
 	void ResetAirAttack();
 	void ResetDodge();
 	void ResetCombos();
 
-	//FSM Attack Check
+	//-----------------------------------------Movement---------------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void EnableRootRotation();
+
+	//-----------------------------------------FSM Attack Check-------------------------------------
 	bool CanAttack();
 	bool CanDodge();
 
-	//Dodge
+
+	//-----------------------------------------Light Attacks----------------------------------------
+	void InputLightAttack();
+	void LightAttack();
+	void PerformLightAttack(int LightAttackIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Light Attack")
+	void SaveLightAttack();
+
+	//-----------------------------------------Heavy Attacks----------------------------------------
+	void InputHeavyAttack();
+	void HeavyAttack();
+	void PerformHeavyAttack(int HeavyAttackIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Heavy Attack")
+	void SaveHeavyAttack();
+
+	//-----------------------------------------Pause Combos-----------------------------------------
+	void SelectHeavyPauseCombo();
+	void NewHeavyCombo();
+	void PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
+
+	UFUNCTION()
+	void HeavyAttackPaused();
+
+	void StartAttackPausedTimer();
+	void ClearAttackPausedTimer();
+
+	//-----------------------------------------Attack Strings---------------------------------------
+	void PerformComboExtender(int ComboExtenderIndex);
+	void PerformComboFinisher();
+	void PerformComboSurge();
+
+	//-----------------------------------------Weapon Collision-------------------------------------
+	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
+	void StartWeaponCollision();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
+	void EndWeaponCollision();
+
+	bool WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLocation, FVector& EndLocation);
+
+
+	//-----------------------------------------Dodge------------------------------------------------
 	void Dodge();
 	void PerformDodge();
 	void DodgeSystem(float X, float Y);
@@ -78,107 +125,86 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Dodge")
 	void DisableRoll();
-
-	//Light Attacks
-	void InputLightAttack();
-	void LightAttack();
-	void PerformLightAttack(int LightAttackIndex);
-	UFUNCTION(BlueprintCallable, Category = "Light Attack")
-	void SaveLightAttack();
-
-	//Heavy Attacks
-	void InputHeavyAttack();
-	void HeavyAttack();
-	void PerformHeavyAttack(int HeavyAttackIndex);
-	UFUNCTION(BlueprintCallable, Category = "Heavy Attack")
-	void SaveHeavyAttack();
-
-	//Heavy Combos
-	void SelectHeavyPauseCombo();
-	void NewHeavyCombo();
-	void PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
-	UFUNCTION()
-	void HeavyAttackPaused();
-
-	//Attack Strings
-	void PerformComboExtender(int ComboExtenderIndex);
-	void PerformComboFinisher();
-	void PerformComboSurge();
-
-	//Timed Attacks
-	void StartAttackPausedTimer();
-	void ClearAttackPausedTimer();
-	
-	//Weapon Collision
-	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
-	void StartWeaponCollision();
-	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
-	void EndWeaponCollision();
-	bool WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLocation, FVector& EndLocation);
-
-	//Movement
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void EnableRootRotation();
-
-	//LockOn
+	//-----------------------------------------LockOn----------------------------------------------
 	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();
+
 	void StopRotation();
 
 	void SoftLockOn(float Distance);
 	void HardLockOn();
 
-	//Timelines
+	//-----------------------------------------Timelines--------------------------------------------
 	void StartBuffer();
 	void StopBuffer();
 
-private:
+	UFUNCTION()
+	void TimelineFloatReturn(float value);
 
-	//Lock Ons
+	UFUNCTION()
+	void OnTimelineFinished();
+
+private:
+	//-----------------------------------------Light Attack-----------------------------------------
+	int LightAttackIndex = 0;
+	bool bLightAttackSaved;
+
+	//-----------------------------------------Heavy Attack-----------------------------------------
+	int HeavyAttackIndex = 0;
+	int NewHeavyAttackIndex = 0;
+	bool bHeavyAttackSaved;
+	bool bHeavyAttackPaused;
+
+	//-----------------------------------------Combo Strings---------------------------------------
+	int ComboExtenderIndex = 0;
+	int ComboSurgeCount = 0;
+	float ComboSurgeSpeed = 1.0;
+
+	//-----------------------------------------Air attack-------------------------------------------
+	int AirComboIndex;
+	bool bLaunched;
+
+	//-----------------------------------------Weapon Collision-------------------------------------
+	bool bActiveCollision = false;
+	TObjectPtr<AActor> WCHitActor;
+	TArray<TObjectPtr<AActor>> AlreadyHitActors_L;
+	TArray<TObjectPtr<AActor>> AlreadyHitActors_R;
+
+	//-----------------------------------------Dodge-----------------------------------------------
+	bool bDodgeSaved;
+	bool bCanRoll;
+	bool bCanDodge = true;
+	TMap<int, int> YCardinalMapping;
+
+	//-----------------------------------------Lock Ons--------------------------------------------
 	bool bTargeting = false;
 	FVector TargetRotateLocation;
 
 	TObjectPtr<AActor> HardTarget;
 	TObjectPtr<AActor> SoftTarget;
 
-	//Dodge logic
-	bool bDodgeSaved;
-	bool bCanRoll;
-	bool bCanDodge = true;
-
-	//Light Attack
-	int LightAttackIndex = 0;
-	bool bLightAttackSaved;
-
-	//Heavy Attack
-	int HeavyAttackIndex = 0;
-	int NewHeavyAttackIndex = 0;
-	bool bHeavyAttackSaved;
-	bool bHeavyAttackPaused;
-
-	//Combo Strings
-	int ComboExtenderIndex = 0;
-	int ComboSurgeCount = 0;
-	float ComboSurgeSpeed = 1.0;
-
-
-	//Air attack
-	int AirComboIndex;
-	bool bLaunched;
-
-	//Weapon Collision
-	bool bActiveCollision = false;
-	TObjectPtr<AActor> WCHitActor;
-	TArray<TObjectPtr<AActor>> AlreadyHitActors_L;
-	TArray<TObjectPtr<AActor>> AlreadyHitActors_R;
-
-	//Timers
+	//-----------------------------------------Timers----------------------------------------------
 	FTimerHandle AttackPauseHandle;
 	FOnAttackPausedEvent OnAttackPausedEvent;
-	//Execution
-	bool bExecuting;
-	TMap<int, int> YCardinalMapping;
 
+	//-----------------------------------------Timelines-------------------------------------------
+	UTimelineComponent* Timeline;
+
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* BufferCurve;
+
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* RotationCurve;
+
+	FOnTimelineFloat InterpFunction{};
+	FOnTimelineEvent TimelineFinished{};
+
+	float BufferAmount;
+
+	//-----------------------------------------Execution-------------------------------------------
+	bool bExecuting;
+
+	//-----------------------------------------Anim Montages---------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
 
@@ -221,30 +247,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
 
-
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
 
-	//Timelines
-	UTimelineComponent* Timeline;
-
-	UPROPERTY(EditAnywhere, Category = "Timeline")
-	UCurveFloat* BufferCurve;
-
-	UPROPERTY(EditAnywhere, Category = "Timeline")
-	UCurveFloat* RotationCurve;
-
-	FOnTimelineFloat InterpFunction{};
-
-	FOnTimelineEvent TimelineFinished{};
-
-	UFUNCTION()
-	void TimelineFloatReturn(float value);
-	UFUNCTION()
-	void OnTimelineFinished();
-
-	float BufferAmount;
 };
 
