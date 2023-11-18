@@ -84,6 +84,7 @@ void APlayableCharacter::ResetCombos()
 	ComboExtenderIndex = 0;
 	ComboSurgeCount = 0;
 	ComboSurgeSpeed = 1.0;
+	BranchFinisher = false;
 }
 
 void APlayableCharacter::ResetState()
@@ -103,8 +104,8 @@ void APlayableCharacter::ResetState()
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
-	ClearAttackPausedTimer();
 	ResetCombos();
+	ClearAttackPausedTimer();
 
 	SetState(EStates::EState_Nothing);
 }
@@ -257,12 +258,6 @@ void APlayableCharacter::StopBuffer()
 
 void APlayableCharacter::TimelineFloatReturn(float value)
 {
-	//Buffer ALGO
-	//BufferAmount = 30.0f;
-	//FVector NewLocation = (GetActorForwardVector() * BufferAmount) + GetActorLocation();
-	//FVector BufferLocation = FMath::Lerp(GetActorLocation(), NewLocation, value);
-	//SetActorLocation(NewLocation);
-
 	if (HardTarget)
 	{
 		TargetRotateLocation = HardTarget->GetActorLocation();
@@ -567,8 +562,14 @@ void APlayableCharacter::SaveLightAttack()
 		}
 		else if (ComboExtenderIndex > 0)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Light"));
-			PerformComboExtender(ComboExtenderIndex);
+			if (BranchFinisher)
+			{
+				PlayAnimMontage(ComboExtenderFinishers[0]);
+			}
+			else
+			{
+				PerformComboExtender(ComboExtenderIndex);
+			}
 		}
 		else
 		{
@@ -596,8 +597,20 @@ void APlayableCharacter::SaveHeavyAttack()
 		}
 		else if (LightAttackIndex == 2)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Heavy"));
-			PerformComboExtender(ComboExtenderIndex);
+			if (BranchFinisher)
+			{
+				PlayAnimMontage(ComboExtenderFinishers[1]);
+
+			}
+			else
+			{
+				ResetLightAttack();
+				PerformComboExtender(ComboExtenderIndex);
+			}
+		}
+		else if (LightAttackIndex == 3)
+		{
+			PlayAnimMontage(ComboExtenderFinishers[2]);
 		}
 		else
 		{
@@ -791,16 +804,22 @@ void APlayableCharacter::InputHeavyAttack()
 
 void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Yur"));
 	UAnimMontage* CurrentMontage = ComboExtender[ExtenderIndex];
 	if (CurrentMontage)
 	{
 		//StopBuffer()
 		//StartBuffer();
+		bHeavyAttackPaused = false;
 		SetState(EStates::EState_Attack);
 		SoftLockOn(500.0f);
 		ComboExtenderIndex++;
 		PlayAnimMontage(CurrentMontage);
+
+		if (ComboExtenderIndex >= ComboExtender.Num())
+		{
+			BranchFinisher = true;
+		}
+		
 	}
 	else
 	{

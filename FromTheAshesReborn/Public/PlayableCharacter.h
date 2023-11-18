@@ -160,6 +160,8 @@ private:
 	int ComboSurgeCount = 0;
 	float ComboSurgeSpeed = 1.0;
 
+	bool BranchFinisher = false;
+
 	//-----------------------------------------Air attack-------------------------------------------
 	int AirComboIndex;
 	bool bLaunched;
@@ -213,6 +215,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> ComboExtender;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
+	TArray<TObjectPtr<UAnimMontage>> ComboExtenderFinishers;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo1;
