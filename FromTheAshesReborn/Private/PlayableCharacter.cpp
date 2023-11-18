@@ -584,6 +584,7 @@ void APlayableCharacter::SaveHeavyAttack()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bHeavyAttackSaved)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("LightAttackIndex: %d"), LightAttackIndex);
 
 		bHeavyAttackSaved = false;
 		//Air Slam()
@@ -595,22 +596,21 @@ void APlayableCharacter::SaveHeavyAttack()
 		{
 			NewHeavyCombo();
 		}
+		else if (LightAttackIndex == 3)
+		{
+			PlayAnimMontage(ComboExtenderFinishers[2]);
+
+		}
 		else if (LightAttackIndex == 2)
 		{
 			if (BranchFinisher)
 			{
 				PlayAnimMontage(ComboExtenderFinishers[1]);
-
 			}
 			else
 			{
-				ResetLightAttack();
 				PerformComboExtender(ComboExtenderIndex);
 			}
-		}
-		else if (LightAttackIndex == 3)
-		{
-			PlayAnimMontage(ComboExtenderFinishers[2]);
 		}
 		else
 		{
@@ -626,6 +626,7 @@ void APlayableCharacter::SaveHeavyAttack()
 		PerformComboSurge();
 	}
 }
+
 
 void APlayableCharacter::StartAttackPausedTimer()
 {
@@ -819,7 +820,6 @@ void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 		{
 			BranchFinisher = true;
 		}
-		
 	}
 	else
 	{
