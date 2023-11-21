@@ -125,6 +125,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Dodge")
 	void DisableRoll();
+
+	UFUNCTION(BlueprintCallable, Category = "Dodge")
+	void EnableDodge();
+
+	UFUNCTION(BlueprintCallable, Category = "Dodge")
+	void DisableDodge();
 	//-----------------------------------------LockOn----------------------------------------------
 	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();

@@ -80,7 +80,6 @@ void APlayableCharacter::ResetDodge()
 
 void APlayableCharacter::ResetCombos()
 {
-	HeavyAttackIndex = 0;
 	ComboExtenderIndex = 0;
 	ComboSurgeCount = 0;
 	ComboSurgeSpeed = 1.0;
@@ -411,6 +410,7 @@ void APlayableCharacter::HardLockOn()
 			if (TargetHit)
 			{
 				AActor* HitActor = OutHit.GetActor();
+				//INTERFACE FOR ENEMIES
 				if (HitActor)
 				{
 					bTargeting = true;
@@ -437,6 +437,16 @@ void APlayableCharacter::EnableRoll()
 void APlayableCharacter::DisableRoll()
 {
 	bCanRoll = false;
+}
+
+void APlayableCharacter::EnableDodge()
+{
+	bCanDodge = true;
+}
+
+void APlayableCharacter::DisableDodge()
+{
+	bCanDodge = false;
 }
 
 void APlayableCharacter::DodgeSystem(float X, float Y)
@@ -475,10 +485,12 @@ void APlayableCharacter::DodgeSystem(float X, float Y)
 			if (bCanRoll)
 			{
 				PlayAnimMontage(ForwardRollAnim);
+				UE_LOG(LogTemp, Warning, TEXT("Roll"));
 			}
 			else
 			{
 				PlayAnimMontage(ForwardDodgeAnim);
+				UE_LOG(LogTemp, Warning, TEXT("Dodge"));
 			}
 		}
 		else if (Y < 0)
@@ -515,16 +527,23 @@ void APlayableCharacter::PerformDodge()
 	SoftTarget = NULL;
 	//StopBuffer()
 	//StartBuffer();
-
+	SetState(EStates::EState_Dodge);
 	if (bTargeting)
 	{
 		DodgeSystem(InputDirection.X, InputDirection.Y);
-		SetState(EStates::EState_Dodge);
 	}
 	else
 	{
-		PlayAnimMontage(ForwardDodgeAnim);
-		SetState(EStates::EState_Dodge);
+		if (bCanRoll)
+		{
+			PlayAnimMontage(ForwardRollAnim);
+			UE_LOG(LogTemp, Warning, TEXT("Roll"));
+		}
+		else
+		{
+			PlayAnimMontage(ForwardDodgeAnim);
+			UE_LOG(LogTemp, Warning, TEXT("Dodge"));
+		}
 	}
 }
 
@@ -584,8 +603,6 @@ void APlayableCharacter::SaveHeavyAttack()
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (bHeavyAttackSaved)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LightAttackIndex: %d"), LightAttackIndex);
-
 		bHeavyAttackSaved = false;
 		//Air Slam()
 		if (IsStateEqualToAny(MakeArray))
@@ -685,9 +702,7 @@ void APlayableCharacter::LightAttack()
 
 void APlayableCharacter::InputLightAttack()
 {
-	//Light attack held to true
 	bDodgeSaved = false;
-	//condition for assassinate
 	bHeavyAttackSaved = false;
 
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
