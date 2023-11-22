@@ -882,7 +882,7 @@ void APlayableCharacter::PerformComboSurge()
 
 		PlayAnimMontage((ComboSurgeCount % 2 == 0) ? ComboSurge_L : ComboSurge_R, ComboSurgeSpeed);
 		ComboSurgeCount += 1;
-		ComboSurgeSpeed = (ComboSurgeCount > 5) ? 1.5 : (ComboSurgeCount > 2) ? 1.3 : 1.2;
+		ComboSurgeSpeed = (ComboSurgeCount > 5) ? 1.6 : (ComboSurgeCount > 2) ? 1.4 : 1.2;
 	}
 	else
 	{
@@ -897,47 +897,38 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& ShotDirection, FVec
 	if (OwnerController == nullptr)
 		return false;
 
-	FVector Location;
-	FRotator Rotation;
+	FVector StartLocation;
+	FRotator ControllerRotation;
 
-	OwnerController->GetPlayerViewPoint(Location, Rotation);
-	ShotDirection = -Rotation.Vector();
+	OwnerController->GetPlayerViewPoint(StartLocation, ControllerRotation);
+	ShotDirection = -ControllerRotation.Vector();
 
-	End = Location + Rotation.Vector() * 50000.f;
+	End = StartLocation + ControllerRotation.Vector() * 50000.f;
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
 
-	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
 }
 
 void APlayableCharacter::ThrowKunai()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ThrowKunai"));
-	
 	FHitResult Hit;
 	FVector ShotDirection;
 	FVector End;
-	bool bSuccess = TraceShot(Hit, ShotDirection, End);
-	UE_LOG(LogTemp, Warning, TEXT("MyBool value: %s"), bSuccess ? TEXT("true") : TEXT("false"));
-	
 
-	FVector Select = UKismetMathLibrary::SelectVector(Hit.Location, End, bSuccess);
+	bool bSuccess = TraceShot(Hit, ShotDirection, End);
+
+	FVector HitLocation = UKismetMathLibrary::SelectVector(Hit.Location, End, bSuccess);
 	FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("Kunai_Socket"));
-	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, Select);
+	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, HitLocation);
 	FTransform LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
 	
-	
-	
-	//UGameplayStatics::SpawnEmitterAttached(MuzzleMist, GetMesh(), TEXT("BulletSocket"));
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
 	if (Projectile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MyBool value: "));
-
-	//Projectile->SetOwner(this);
-
+		Projectile->SetOwner(this);
 	}
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);

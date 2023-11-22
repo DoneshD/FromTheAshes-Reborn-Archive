@@ -12,12 +12,12 @@ AProjectile::AProjectile()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	RootComponent = ProjectileMesh;
 
-	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
+	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Trail Particles"));
 	TrailParticles->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	ProjectileMovementComponent->MaxSpeed = 10000.f;
-	ProjectileMovementComponent->InitialSpeed = 10000.f;
+	ProjectileMovementComponent->MaxSpeed = 3000.f;
+	ProjectileMovementComponent->InitialSpeed = 3000.f;
 
 }
 
@@ -25,7 +25,7 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 	//StartLocation = GetActorLocation();
 	
 }
@@ -40,8 +40,6 @@ void AProjectile::Tick(float DeltaTime)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hit"));
-	/*
 	AActor* MyOwner = GetOwner();
 
 	if (MyOwner == nullptr) {
@@ -58,6 +56,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 			UE_LOG(LogTemp, Warning, TEXT("Particles"));
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	}
-	Destroy();
-	*/
+	//Destroy();
+	
 }

@@ -26,10 +26,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	UParticleSystemComponent* TrailParticles;
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	class UParticleSystem* HitParticles;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
