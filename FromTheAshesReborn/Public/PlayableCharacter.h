@@ -32,13 +32,17 @@ class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
 	GENERATED_BODY()
 
 protected:
+
 	//-----------------------------------------Constructor------------------------------------------
+
 	APlayableCharacter();
 
 	//-----------------------------------------BeginPlay--------------------------------------------
+
 	virtual void BeginPlay() override;
 
 	//-----------------------------------------Inputs-----------------------------------------------
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LightAttack;
 
@@ -51,7 +55,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_LockOn;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_ThrowKunai;
+
 	//-----------------------------------------FSM Reset States-------------------------------------
+
 	UFUNCTION(BlueprintCallable, Category = "FSM")
 	void ResetState();
 
@@ -62,15 +70,18 @@ protected:
 	void ResetCombos();
 
 	//-----------------------------------------Movement---------------------------------------------
+
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void EnableRootRotation();
 
 	//-----------------------------------------FSM Attack Check-------------------------------------
+
 	bool CanAttack();
 	bool CanDodge();
 
 
 	//-----------------------------------------Light Attacks----------------------------------------
+
 	void InputLightAttack();
 	void LightAttack();
 	void PerformLightAttack(int LightAttackIndex);
@@ -79,6 +90,7 @@ protected:
 	void SaveLightAttack();
 
 	//-----------------------------------------Heavy Attacks----------------------------------------
+
 	void InputHeavyAttack();
 	void HeavyAttack();
 	void PerformHeavyAttack(int HeavyAttackIndex);
@@ -87,6 +99,7 @@ protected:
 	void SaveHeavyAttack();
 
 	//-----------------------------------------Pause Combos-----------------------------------------
+
 	void SelectHeavyPauseCombo();
 	void NewHeavyCombo();
 	void PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
@@ -98,11 +111,13 @@ protected:
 	void ClearAttackPausedTimer();
 
 	//-----------------------------------------Attack Strings---------------------------------------
+
 	void PerformComboExtender(int ComboExtenderIndex);
 	void PerformComboFinisher();
 	void PerformComboSurge();
 
 	//-----------------------------------------Weapon Collision-------------------------------------
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon Collision")
 	void StartWeaponCollision();
 
@@ -113,6 +128,7 @@ protected:
 
 
 	//-----------------------------------------Dodge------------------------------------------------
+
 	void Dodge();
 	void PerformDodge();
 	void DodgeSystem(float X, float Y);
@@ -131,7 +147,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Dodge")
 	void DisableDodge();
+
 	//-----------------------------------------LockOn----------------------------------------------
+
 	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();
 
@@ -141,6 +159,7 @@ protected:
 	void HardLockOn();
 
 	//-----------------------------------------Timelines--------------------------------------------
+
 	void StartBuffer();
 	void StopBuffer();
 
@@ -150,18 +169,26 @@ protected:
 	UFUNCTION()
 	void OnTimelineFinished();
 
+	//-----------------------------------------Timelines--------------------------------------------
+
+	void ThrowKunai();
+	bool TraceShot(FHitResult& Hit, FVector& ShotDirection, FVector& End);
+
 private:
 	//-----------------------------------------Light Attack-----------------------------------------
+
 	int LightAttackIndex = 0;
 	bool bLightAttackSaved;
 
 	//-----------------------------------------Heavy Attack-----------------------------------------
+
 	int HeavyAttackIndex = 0;
 	int NewHeavyAttackIndex = 0;
 	bool bHeavyAttackSaved;
 	bool bHeavyAttackPaused;
 
 	//-----------------------------------------Combo Strings---------------------------------------
+
 	int ComboExtenderIndex = 0;
 	int ComboSurgeCount = 0;
 	float ComboSurgeSpeed = 1.0;
@@ -190,11 +217,10 @@ private:
 
 	TObjectPtr<AActor> HardTarget;
 	TObjectPtr<AActor> SoftTarget;
-
 	//-----------------------------------------Timers----------------------------------------------
+
 	FTimerHandle AttackPauseHandle;
 	FOnAttackPausedEvent OnAttackPausedEvent;
-
 	//-----------------------------------------Timelines-------------------------------------------
 	TObjectPtr<UTimelineComponent> Timeline;
 
@@ -210,6 +236,7 @@ private:
 	float BufferAmount;
 
 	//-----------------------------------------Execution-------------------------------------------
+
 	bool bExecuting;
 
 	//-----------------------------------------Anim Montages---------------------------------------
@@ -234,11 +261,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Surge")
 	TObjectPtr<UAnimMontage> ComboSurge_L;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Bybass")
-	TObjectPtr<UAnimMontage> ComboBybass;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Surge")
 	TObjectPtr<UAnimMontage> ComboSurge_R;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Bybass")
+	TObjectPtr<UAnimMontage> ComboBybass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TObjectPtr<UAnimMontage> ForwardDodgeAnim;
@@ -257,6 +284,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
+
+	//-----------------------------------------Projectile---------------------------------------
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile Combat")
+	TSubclassOf<class AProjectile> ProjectileClass;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

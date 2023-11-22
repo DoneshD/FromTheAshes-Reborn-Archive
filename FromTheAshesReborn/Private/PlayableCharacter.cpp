@@ -3,6 +3,7 @@
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Projectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 
@@ -228,6 +229,7 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		InputComp->BindAction(Input_HeavyAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputHeavyAttack);
 		InputComp->BindAction(Input_Dodge, ETriggerEvent::Started, this, &APlayableCharacter::Dodge);
 		InputComp->BindAction(Input_LockOn, ETriggerEvent::Started, this, &APlayableCharacter::HardLockOn);
+		InputComp->BindAction(Input_ThrowKunai, ETriggerEvent::Started, this, &APlayableCharacter::ThrowKunai);
 	}
 }
 
@@ -887,4 +889,48 @@ void APlayableCharacter::PerformComboSurge()
 		return;
 	}
 
+}
+
+bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& ShotDirection, FVector& End)
+{
+	AController* OwnerController = GetController();
+	if (OwnerController == nullptr)
+		return false;
+
+	FVector Location;
+	FRotator Rotation;
+
+	OwnerController->GetPlayerViewPoint(Location, Rotation);
+	ShotDirection = -Rotation.Vector();
+
+	End = Location + Rotation.Vector() * 50000.f;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+
+	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
+}
+
+void APlayableCharacter::ThrowKunai()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ThrowKunai"));
+	FHitResult Hit;
+	FVector ShotDirection;
+	FVector End;
+
+	bool bSuccess = TraceShot(Hit, ShotDirection, End);
+
+	FVector Select = UKismetMathLibrary::SelectVector(Hit.Location, End, bSuccess);
+	FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("BulletSocket"));
+	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, Select);
+	FTransform LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
+	
+	
+	//UGameplayStatics::SpawnEmitterAttached(MuzzleMist, GetMesh(), TEXT("BulletSocket"));
+	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
+	Projectile->SetOwner(this);
+			
+	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
+	
 }
