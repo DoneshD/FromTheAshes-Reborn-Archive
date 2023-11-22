@@ -317,7 +317,7 @@ bool APlayableCharacter::WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLoca
 		ObjectTypes,
 		false,
 		ActorArray,
-		EDrawDebugTrace::None,
+		EDrawDebugTrace::ForDuration,
 		Hit,
 		true);
 

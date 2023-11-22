@@ -196,13 +196,13 @@ private:
 	FOnAttackPausedEvent OnAttackPausedEvent;
 
 	//-----------------------------------------Timelines-------------------------------------------
-	UTimelineComponent* Timeline;
+	TObjectPtr<UTimelineComponent> Timeline;
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
-	UCurveFloat* BufferCurve;
+	TObjectPtr<UCurveFloat> BufferCurve;
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
-	UCurveFloat* RotationCurve;
+	TObjectPtr <UCurveFloat> RotationCurve;
 
 	FOnTimelineFloat InterpFunction{};
 	FOnTimelineEvent TimelineFinished{};
