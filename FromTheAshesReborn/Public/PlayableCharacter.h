@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Projectile.h"
 #include "Components/TimelineComponent.h"
 #include "PlayableCharacter.generated.h"
 

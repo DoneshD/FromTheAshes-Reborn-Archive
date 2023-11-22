@@ -13,7 +13,6 @@ class FROMTHEASHESREBORN_API AProjectile : public AActor
 	
 
 protected:
-	AProjectile();
 
 	virtual void BeginPlay() override;
 
@@ -21,17 +20,17 @@ private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* ProjectileMesh;
+
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	UParticleSystemComponent* TrailParticles;
 
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	TObjectPtr<UParticleSystemComponent> TrailParticles;
-
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	TObjectPtr<UParticleSystemComponent> HitParticles;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	class UParticleSystem* HitParticles;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float Damage = 10;
@@ -45,5 +44,7 @@ private:
 public:	
 
 	virtual void Tick(float DeltaTime) override;
+
+	AProjectile();
 
 };

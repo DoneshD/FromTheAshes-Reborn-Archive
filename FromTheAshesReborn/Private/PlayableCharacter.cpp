@@ -915,21 +915,30 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& ShotDirection, FVec
 void APlayableCharacter::ThrowKunai()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ThrowKunai"));
+	
 	FHitResult Hit;
 	FVector ShotDirection;
 	FVector End;
-
 	bool bSuccess = TraceShot(Hit, ShotDirection, End);
+	UE_LOG(LogTemp, Warning, TEXT("MyBool value: %s"), bSuccess ? TEXT("true") : TEXT("false"));
+	
 
 	FVector Select = UKismetMathLibrary::SelectVector(Hit.Location, End, bSuccess);
-	FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("BulletSocket"));
+	FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("Kunai_Socket"));
 	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, Select);
 	FTransform LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
 	
 	
+	
 	//UGameplayStatics::SpawnEmitterAttached(MuzzleMist, GetMesh(), TEXT("BulletSocket"));
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
-	Projectile->SetOwner(this);
+	if (Projectile)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MyBool value: "));
+
+	//Projectile->SetOwner(this);
+
+	}
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 	

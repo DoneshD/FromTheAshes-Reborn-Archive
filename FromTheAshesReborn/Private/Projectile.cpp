@@ -1,6 +1,7 @@
 #include "Projectile.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 // Sets default values
@@ -11,11 +12,8 @@ AProjectile::AProjectile()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	RootComponent = ProjectileMesh;
 
-	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Trail Particles"));
+	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
 	TrailParticles->SetupAttachment(RootComponent);
-
-	HitParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Hit Particles"));
-	HitParticles->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	ProjectileMovementComponent->MaxSpeed = 10000.f;
@@ -27,8 +25,8 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
-	StartLocation = GetActorLocation();
+	//ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	//StartLocation = GetActorLocation();
 	
 }
 
@@ -42,6 +40,8 @@ void AProjectile::Tick(float DeltaTime)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Hit"));
+	/*
 	AActor* MyOwner = GetOwner();
 
 	if (MyOwner == nullptr) {
@@ -59,4 +59,5 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	}
 	Destroy();
+	*/
 }
