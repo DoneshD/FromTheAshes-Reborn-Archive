@@ -59,6 +59,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_ThrowKunai;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_Interact;
+
+
 	//-----------------------------------------FSM Reset States-------------------------------------
 
 	UFUNCTION(BlueprintCallable, Category = "FSM")
@@ -170,10 +174,14 @@ protected:
 	UFUNCTION()
 	void OnTimelineFinished();
 
-	//-----------------------------------------Timelines--------------------------------------------
+	//-----------------------------------------Kunai-------------------------------------------------
 
 	void ThrowKunai();
 	bool TraceShot(FHitResult& Hit, FVector& ShotDirection, FVector& End);
+
+	//-----------------------------------------Interact-------------------------------------------------
+
+	void Interact();
 
 private:
 	//-----------------------------------------Light Attack-----------------------------------------
@@ -288,10 +296,7 @@ private:
 
 	//-----------------------------------------Projectile---------------------------------------
 
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile Combat")
-	TSubclassOf<class AProjectile> ProjectileClass;
-
-	TArray<AProjectile*> ProjectileArray;
+	
 
 
 public:
@@ -300,6 +305,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool bKunaiLanded = true;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AProjectile> ProjectileClass;
+
+	TArray<AProjectile*> ProjectileArray;
+
+	AProjectile* Projectile;
 
 };
 

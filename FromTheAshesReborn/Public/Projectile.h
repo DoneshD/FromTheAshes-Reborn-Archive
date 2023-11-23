@@ -27,7 +27,7 @@ private:
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
-	UParticleSystemComponent* TrailParticles;
+	class UParticleSystemComponent* TrailParticles;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	class UParticleSystem* HitParticles;

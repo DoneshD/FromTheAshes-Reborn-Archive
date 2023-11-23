@@ -13,7 +13,7 @@ AProjectile::AProjectile()
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	RootComponent = ProjectileMesh;
 
-	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Trail Particles"));
+	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
 	TrailParticles->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
@@ -40,14 +40,14 @@ void AProjectile::Tick(float DeltaTime)
 	FVector DistanceDiff = GetActorLocation() - StartLocation;
 	if (DistanceDiff.X > PositiveDestroyDistance || DistanceDiff.Y > PositiveDestroyDistance)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Test"));
+		//Need to remove from the projectile array
 		Destroy();
 	}
 
 
 	if (DistanceDiff.X < NegativeDestroyDistance || DistanceDiff.Y < NegativeDestroyDistance)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Test"));
+		//Need to remove from the projectile array
 		Destroy();
 	}
 
@@ -68,7 +68,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
 	{
 		if (HitParticles)
-			UE_LOG(LogTemp, Warning, TEXT("Particles"));
+			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 		APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(MyOwner);
 		PlayerCharacter->bKunaiLanded = true;

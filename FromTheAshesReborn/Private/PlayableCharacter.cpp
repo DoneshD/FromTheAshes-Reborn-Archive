@@ -230,6 +230,7 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		InputComp->BindAction(Input_Dodge, ETriggerEvent::Started, this, &APlayableCharacter::Dodge);
 		InputComp->BindAction(Input_LockOn, ETriggerEvent::Started, this, &APlayableCharacter::HardLockOn);
 		InputComp->BindAction(Input_ThrowKunai, ETriggerEvent::Started, this, &APlayableCharacter::ThrowKunai);
+		InputComp->BindAction(Input_Interact, ETriggerEvent::Started, this, &APlayableCharacter::Interact);
 	}
 }
 
@@ -912,6 +913,19 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& ShotDirection, FVec
 	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
 }
 
+void APlayableCharacter::Interact()
+{
+	if (!ProjectileArray.IsEmpty() && bKunaiLanded)
+	{
+		this->TeleportTo(ProjectileArray[0]->GetActorLocation(), ProjectileArray[0]->GetActorRotation());
+		ProjectileArray.Empty();
+	}
+}
+
+
+	
+
+
 void APlayableCharacter::ThrowKunai()
 {
 	FHitResult Hit;
@@ -925,15 +939,18 @@ void APlayableCharacter::ThrowKunai()
 	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, HitLocation);
 	FTransform LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
 
-
 	if (bKunaiLanded)
 	{
-		for (AProjectile* Projectile : ProjectileArray)
+		for (AProjectile* CurrentProjectile : ProjectileArray)
 		{
-			Projectile->Destroy();
+			if (CurrentProjectile)
+			{
+				CurrentProjectile->Destroy();
+			}
 		}
+		ProjectileArray.Empty();
 		
-		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
+		Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
 		if (Projectile)
 		{
 			bKunaiLanded = false;
