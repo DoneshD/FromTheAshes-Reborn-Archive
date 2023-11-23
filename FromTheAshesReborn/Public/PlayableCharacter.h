@@ -296,8 +296,10 @@ private:
 
 	//-----------------------------------------Projectile---------------------------------------
 
-	
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AProjectile> ProjectileClass;
 
+	AProjectile* Projectile;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -305,13 +307,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool bKunaiLanded = true;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClass;
-
-	TArray<AProjectile*> ProjectileArray;
-
-	AProjectile* Projectile;
 
 };
 

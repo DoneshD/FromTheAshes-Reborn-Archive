@@ -915,16 +915,13 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& ShotDirection, FVec
 
 void APlayableCharacter::Interact()
 {
-	if (!ProjectileArray.IsEmpty() && bKunaiLanded)
+	if (Projectile && bKunaiLanded)
 	{
-		this->TeleportTo(ProjectileArray[0]->GetActorLocation(), ProjectileArray[0]->GetActorRotation());
-		ProjectileArray.Empty();
+		this->TeleportTo(Projectile->GetActorLocation(), Projectile->GetActorRotation());
+		Projectile->Destroy();
+		Projectile = nullptr;
 	}
 }
-
-
-	
-
 
 void APlayableCharacter::ThrowKunai()
 {
@@ -941,25 +938,20 @@ void APlayableCharacter::ThrowKunai()
 
 	if (bKunaiLanded)
 	{
-		for (AProjectile* CurrentProjectile : ProjectileArray)
+		if (Projectile)
 		{
-			if (CurrentProjectile)
-			{
-				CurrentProjectile->Destroy();
-			}
+			Projectile->Destroy();
+			Projectile = nullptr;
 		}
-		ProjectileArray.Empty();
 		
 		Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
 		if (Projectile)
 		{
 			bKunaiLanded = false;
 			Projectile->SetOwner(this);
-			ProjectileArray.Add(Projectile);
 		}
 	}
-	
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
-	
+
 }
