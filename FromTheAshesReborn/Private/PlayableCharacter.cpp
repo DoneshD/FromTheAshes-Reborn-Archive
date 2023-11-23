@@ -319,7 +319,7 @@ bool APlayableCharacter::WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLoca
 		ObjectTypes,
 		false,
 		ActorArray,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		Hit,
 		true);
 
@@ -924,12 +924,24 @@ void APlayableCharacter::ThrowKunai()
 	FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("Kunai_Socket"));
 	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, HitLocation);
 	FTransform LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
-	
-	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
-	if (Projectile)
+
+
+	if (bKunaiLanded)
 	{
-		Projectile->SetOwner(this);
+		for (AProjectile* Projectile : ProjectileArray)
+		{
+			Projectile->Destroy();
+		}
+		
+		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
+		if (Projectile)
+		{
+			bKunaiLanded = false;
+			Projectile->SetOwner(this);
+			ProjectileArray.Add(Projectile);
+		}
 	}
+	
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 	
