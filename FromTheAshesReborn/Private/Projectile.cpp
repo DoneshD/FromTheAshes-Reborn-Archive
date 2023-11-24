@@ -2,6 +2,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
+#include "Components/ArrowComponent.h"
 #include "PlayableCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -12,6 +13,9 @@ AProjectile::AProjectile()
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	RootComponent = ProjectileMesh;
+
+	ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
+	ArrowComponent->SetupAttachment(RootComponent);
 
 	TrailParticles = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Smoke Trail"));
 	TrailParticles->SetupAttachment(RootComponent);
@@ -41,14 +45,13 @@ void AProjectile::Tick(float DeltaTime)
 	if (DistanceDiff.X > PositiveDestroyDistance || DistanceDiff.Y > PositiveDestroyDistance)
 	{
 		//Need to remove from the projectile array
-		Destroy();
+		DestroyProjectile();
 	}
-
 
 	if (DistanceDiff.X < NegativeDestroyDistance || DistanceDiff.Y < NegativeDestroyDistance)
 	{
 		//Need to remove from the projectile array
-		Destroy();
+		DestroyProjectile();
 	}
 
 }
@@ -69,9 +72,15 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	{
 		if (HitParticles)
 			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 		APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(MyOwner);
 		PlayerCharacter->bKunaiLanded = true;
 	}
 	
+}
+
+void AProjectile::DestroyProjectile()
+{
+	APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(GetOwner());
+	PlayerCharacter->bKunaiLanded = true;
+	Destroy();
 }

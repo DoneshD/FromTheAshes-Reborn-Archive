@@ -139,7 +139,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 				FVector ResultVectorAVector(0, 0, 80.f);
 			}
 
-			FVector ResultVector(0, 0, 150.0f);
+			FVector ResultVector(0, 0, 0);
 			FVector TargetLocation = HardTarget->GetActorLocation() - ResultVector;
 			FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
 			FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.f);
@@ -892,27 +892,6 @@ void APlayableCharacter::PerformComboSurge()
 
 }
 
-bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& ShotDirection, FVector& End)
-{
-	AController* OwnerController = GetController();
-	if (OwnerController == nullptr)
-		return false;
-
-	FVector StartLocation;
-	FRotator ControllerRotation;
-
-	OwnerController->GetPlayerViewPoint(StartLocation, ControllerRotation);
-	ShotDirection = -ControllerRotation.Vector();
-
-	End = StartLocation + ControllerRotation.Vector() * 50000.f;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(GetOwner());
-
-	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
-}
-
 void APlayableCharacter::Interact()
 {
 	if (Projectile && bKunaiLanded)
@@ -923,18 +902,53 @@ void APlayableCharacter::Interact()
 	}
 }
 
+bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& EndLocation)
+{
+	AController* OwnerController = GetController();
+	if (OwnerController == nullptr)
+		return false;
+
+	FVector StartLocation = GetActorLocation();
+
+	FVector ControllerLocation;
+	FRotator ControllerRotation;
+
+	OwnerController->GetPlayerViewPoint(ControllerLocation, ControllerRotation);
+	EndLocation = ControllerLocation + ControllerRotation.Vector() * 50000.f;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 2.0f, 0, 1.0f);
+
+	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_GameTraceChannel1, Params);
+}
+
 void APlayableCharacter::ThrowKunai()
 {
 	FHitResult Hit;
-	FVector ShotDirection;
-	FVector End;
+	FVector EndLocation;
+	FVector HitLocation;
 
-	bool bSuccess = TraceShot(Hit, ShotDirection, End);
-
-	FVector HitLocation = UKismetMathLibrary::SelectVector(Hit.Location, End, bSuccess);
 	FVector SocketLocation = GetMesh()->GetSocketLocation(TEXT("Kunai_Socket"));
-	FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, HitLocation);
-	FTransform LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
+	FRotator LookRotation;
+	FTransform LookFire;
+
+	if (!bTargeting)
+	{
+		bool bSuccess = TraceShot(Hit, EndLocation);
+
+		HitLocation = UKismetMathLibrary::SelectVector(Hit.Location, EndLocation, bSuccess);
+		LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, HitLocation);
+	}
+	else
+	{
+		LookRotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, HardTarget->GetActorLocation());
+	}
+
+	LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
+
 
 	if (bKunaiLanded)
 	{

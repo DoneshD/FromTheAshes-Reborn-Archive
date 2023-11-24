@@ -177,8 +177,7 @@ protected:
 	//-----------------------------------------Kunai-------------------------------------------------
 
 	void ThrowKunai();
-	bool TraceShot(FHitResult& Hit, FVector& ShotDirection, FVector& End);
-
+	bool TraceShot(FHitResult& Hit, FVector& EndLocation);
 	//-----------------------------------------Interact-------------------------------------------------
 
 	void Interact();
