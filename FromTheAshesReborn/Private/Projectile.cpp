@@ -4,6 +4,7 @@
 #include "GameFramework/DamageType.h"
 #include "Components/ArrowComponent.h"
 #include "PlayableCharacter.h"
+#include "MeleeEnemy.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 // Sets default values
@@ -23,6 +24,8 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	ProjectileMovementComponent->MaxSpeed = 20000.f;
 	ProjectileMovementComponent->InitialSpeed = 20000.f;
+
+	
 
 }
 
@@ -72,8 +75,16 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	{
 		if (HitParticles)
 			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+
 		APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(MyOwner);
 		PlayerCharacter->bKunaiLanded = true;
+
+		//USE INTERFACES!!!!!!!!!!!
+		AMeleeEnemy* Enemy = Cast<AMeleeEnemy>(HitActor);
+		if (Enemy)
+		{
+			PlayerCharacter->bFlank = true;
+		}
 	}
 	
 }
@@ -81,6 +92,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 void AProjectile::DestroyProjectile()
 {
 	APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(GetOwner());
-	PlayerCharacter->bKunaiLanded = true;
 	Destroy();
+	PlayerCharacter->bKunaiLanded = true;
 }

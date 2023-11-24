@@ -293,6 +293,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Dodge Anim")
 	TArray<FSideDodgeArray> CardinalRollArray;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Throw Anim")
+	TObjectPtr<UAnimMontage> KunaiThrow;
+
 	//-----------------------------------------Projectile---------------------------------------
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
@@ -306,6 +309,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool bKunaiLanded = true;
+
+	bool bFlank = false;
 
 };
 

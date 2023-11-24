@@ -896,9 +896,45 @@ void APlayableCharacter::Interact()
 {
 	if (Projectile && bKunaiLanded)
 	{
-		this->TeleportTo(Projectile->GetActorLocation(), Projectile->GetActorRotation());
+		this->TeleportTo(Projectile->GetActorLocation(), GetActorRotation());
 		Projectile->Destroy();
 		Projectile = nullptr;
+		if (bFlank)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Flanking"));
+			bFlank = false;
+
+			FHitResult OutHit;
+
+			TArray<AActor*> ActorArray;
+			ActorArray.Add(this);
+
+			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+			bool TargetHit = UKismetSystemLibrary::SphereTraceSingleForObjects(
+				GetWorld(),
+				GetActorLocation(),
+				GetActorLocation(),
+				200.f,
+				ObjectTypes,
+				false,
+				ActorArray,
+				EDrawDebugTrace::ForDuration,
+				OutHit,
+				true);
+
+			if (TargetHit)
+			{
+				AActor* HitEnemy = OutHit.GetActor();
+				FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), HitEnemy->GetActorLocation());
+				FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.f);
+
+				GetController()->SetControlRotation(InterpRot);
+				SetActorRotation(InterpRot);
+				UE_LOG(LogTemp, Warning, TEXT("Test"));
+			}
+		}
 	}
 }
 
@@ -919,8 +955,6 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& EndLocation)
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
-
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 2.0f, 0, 1.0f);
 
 	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_GameTraceChannel1, Params);
 }
@@ -957,8 +991,12 @@ void APlayableCharacter::ThrowKunai()
 			Projectile->Destroy();
 			Projectile = nullptr;
 		}
-		
+		if (KunaiThrow) 
+		{
+			PlayAnimMontage(KunaiThrow);
+		}
 		Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
+		
 		if (Projectile)
 		{
 			bKunaiLanded = false;
