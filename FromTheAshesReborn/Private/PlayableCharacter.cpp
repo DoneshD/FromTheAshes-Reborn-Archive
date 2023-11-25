@@ -707,6 +707,7 @@ void APlayableCharacter::InputLightAttack()
 {
 	bDodgeSaved = false;
 	bHeavyAttackSaved = false;
+	ClearAttackPausedTimer();
 
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (IsStateEqualToAny(MakeArray))
@@ -852,6 +853,7 @@ void APlayableCharacter::PerformComboFinisher()
 	{
 		if (ComboBybass)
 		{
+			bHeavyAttackPaused = false;
 			ResetLightAttack();
 			ResetHeavyAttack();
 			//StopBuffer()
@@ -877,6 +879,7 @@ void APlayableCharacter::PerformComboSurge()
 
 	if (!IsStateEqualToAny(MakeArray))
 	{
+		bHeavyAttackPaused = false;
 		ResetLightAttack();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(500.0f);
@@ -986,6 +989,7 @@ void APlayableCharacter::ThrowKunai()
 
 	if (bKunaiLanded)
 	{
+		//Cast<IFireProjectileInterface>(this)->Fire();
 		if (Projectile)
 		{
 			Projectile->Destroy();
@@ -1005,5 +1009,4 @@ void APlayableCharacter::ThrowKunai()
 	}
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
-
 }
