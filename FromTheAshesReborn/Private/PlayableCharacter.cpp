@@ -992,39 +992,33 @@ void APlayableCharacter::ThrowKunai()
 
 	//Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
 
-	//AKunai* Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
+	Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
 
-	Base = GetWorld()->SpawnActor<AProjectileBase>(ProjectileBaseClass, LookFire);
-	if (Base)
-	{
-		Base->SetOwner(this);
-	}
 	
 
-
-	/*
+	
 	if (bKunaiLanded)
 	{
 	
-		//Cast<IFireProjectileInterface>(this)->Fire();
-		if (Projectile)
+		if (Kunai)
 		{
-			Projectile->Destroy();
-			Projectile = nullptr;
+			Kunai->Destroy();
+			Kunai = nullptr;
 		}
 		if (KunaiThrow) 
 		{
-			PlayAnimMontage(KunaiThrow);
+			//PlayAnimMontage(KunaiThrow);
+			UE_LOG(LogTemp, Warning, TEXT("Play Anim"))
 		}
-		Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
+		Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
 		
-		if (Projectile)
+		if (Kunai)
 		{
 			bKunaiLanded = false;
-			Projectile->SetOwner(this);
+			Kunai->SetOwner(this);
 		}
 	}
-	*/
+	
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 }

@@ -310,14 +310,12 @@ private:
 
 	AProjectileBase* Base;
 
+	AKunai* Kunai;
+
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
-
-	bool bKunaiLanded = true;
-
-	bool bFlank = false;
 
 	//-----------------------------------------INTERFACE PRACTICE---------------------------------------
 

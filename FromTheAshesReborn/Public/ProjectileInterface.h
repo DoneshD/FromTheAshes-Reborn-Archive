@@ -25,4 +25,7 @@ public:
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 	UFUNCTION()
 	virtual void Print() = 0;
+
+	UFUNCTION()
+	virtual void SetKunaiLanded() = 0;
 };

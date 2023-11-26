@@ -75,5 +75,12 @@ public:
 	UFUNCTION()
 	virtual void Print() override;
 
+	UFUNCTION()
+	virtual void SetKunaiLanded() override;
+
 	EStates CurrentState;
+
+	bool bKunaiLanded = true;
+
+	bool bFlank = false;
 };

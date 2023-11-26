@@ -117,6 +117,13 @@ void AFTACharacter::Print()
 	UE_LOG(LogTemp, Warning, TEXT("Im an FTA Character"));
 }
 
+void AFTACharacter::SetKunaiLanded()
+{
+	bKunaiLanded = true;
+
+}
+
+
 void AFTACharacter::DoubleJump()
 {
 	if (CanJump())

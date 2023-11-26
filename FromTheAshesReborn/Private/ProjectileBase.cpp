@@ -1,5 +1,6 @@
 #include "ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "PlayableCharacter.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "MeleeEnemy.h"
 #include "ProjectileInterface.h"
@@ -54,6 +55,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 	AActor* MyOwner = GetOwner();
 
 	if (MyOwner == nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("Test 1"));
 		Destroy();
 		return;
 	}
@@ -62,12 +64,16 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Test 2"));
+
 		if (HitParticles)
 			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
 
-		IProjectileInterface* Interface = Cast<IProjectileInterface>(Hit.GetActor());
+
+		IProjectileInterface* Interface = Cast<IProjectileInterface>(MyOwner);
 		if (Interface)
 		{
+			Interface->SetKunaiLanded();
 			Interface->Print();
 		}
 
@@ -76,5 +82,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 void AProjectileBase::DestroyProjectile()
 {
+	APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(GetOwner());
 	Destroy();
+	PlayerCharacter->bKunaiLanded = true;
 }
