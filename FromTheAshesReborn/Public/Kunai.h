@@ -15,15 +15,15 @@ class FROMTHEASHESREBORN_API AKunai : public AProjectileBase
 	GENERATED_BODY()
 
 protected:
-	AKunai();
-
 	virtual void BeginPlay() override;
-
 
 private:
 
 public:
 	
 	virtual void Tick(float DeltaTime) override;
+
+	AKunai();
+
 
 };

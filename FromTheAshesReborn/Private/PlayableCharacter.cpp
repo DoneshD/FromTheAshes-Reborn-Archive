@@ -3,7 +3,11 @@
 #include "PlayableCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+
 #include "Projectile.h"
+#include "Kunai.h"
+#include "ProjectileBase.h"
+
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 
@@ -958,7 +962,7 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& EndLocation)
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
-
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 2.0f, 0, 1.0f);
 	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_GameTraceChannel1, Params);
 }
 
@@ -986,7 +990,18 @@ void APlayableCharacter::ThrowKunai()
 
 	LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
 
+	//Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
 
+	AKunai* Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
+
+	//Base = GetWorld()->SpawnActor<AProjectileBase>(ProjectileBaseClass, LookFire);
+	if (Kunai)
+	{
+		Kunai->SetOwner(this);
+	}
+
+
+	/*
 	if (bKunaiLanded)
 	{
 		//Cast<IFireProjectileInterface>(this)->Fire();
@@ -1007,6 +1022,7 @@ void APlayableCharacter::ThrowKunai()
 			Projectile->SetOwner(this);
 		}
 	}
+	*/
 			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 }

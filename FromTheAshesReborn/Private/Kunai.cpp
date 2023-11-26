@@ -3,17 +3,24 @@
 
 #include "Kunai.h"
 
+
 AKunai::AKunai()
 {
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 
 void AKunai::BeginPlay()
 {
+	Super::BeginPlay();
 
 }
+
 
 void AKunai::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 
 }
+
+

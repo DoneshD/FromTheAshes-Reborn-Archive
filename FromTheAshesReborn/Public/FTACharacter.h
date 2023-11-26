@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EStates.h"
+#include "ProjectileInterface.h"
 #include "InputAction.h"
 #include "FTACharacter.generated.h"
 
@@ -12,9 +13,8 @@ class UInputMappingContext;
 class UCameraComponent;
 class USpringArmComponent;
 
-
 UCLASS()
-class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter
+class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter, public IProjectileInterface
 {
 	GENERATED_BODY()
 
@@ -71,6 +71,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
 	EStates CurrentState;
 };

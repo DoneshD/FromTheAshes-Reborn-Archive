@@ -15,13 +15,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 	void DestroyProjectile();
-
-	AProjectileBase();
-private:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ProjectileMesh;
@@ -37,14 +31,21 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float Damage;
+
 	float PositiveDestroyDistance = 10000;
 	float NegativeDestroyDistance = -10000;
 	FVector StartLocation;
+
+	AController* GetOwnerController() const;
+
+private:
+	
 
 public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	AProjectileBase();
 
 
 };

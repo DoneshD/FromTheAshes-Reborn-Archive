@@ -300,7 +300,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Kunai")
+	TSubclassOf<class AKunai> KunaiClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Kunai")
+	TSubclassOf<class AProjectileBase> ProjectileBaseClass;
+
 	AProjectile* Projectile;
+
+	AProjectileBase* Base;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
