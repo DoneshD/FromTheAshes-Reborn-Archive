@@ -992,18 +992,20 @@ void APlayableCharacter::ThrowKunai()
 
 	//Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
 
-	AKunai* Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
+	//AKunai* Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
 
-	//Base = GetWorld()->SpawnActor<AProjectileBase>(ProjectileBaseClass, LookFire);
-	if (Kunai)
+	Base = GetWorld()->SpawnActor<AProjectileBase>(ProjectileBaseClass, LookFire);
+	if (Base)
 	{
-		Kunai->SetOwner(this);
+		Base->SetOwner(this);
 	}
+	
 
 
 	/*
 	if (bKunaiLanded)
 	{
+	
 		//Cast<IFireProjectileInterface>(this)->Fire();
 		if (Projectile)
 		{

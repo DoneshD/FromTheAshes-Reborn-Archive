@@ -17,6 +17,11 @@ protected:
 
 	void DestroyProjectile();
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
+private:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ProjectileMesh;
 
@@ -37,8 +42,6 @@ protected:
 	FVector StartLocation;
 
 	AController* GetOwnerController() const;
-
-private:
 	
 
 public:
@@ -46,6 +49,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	AProjectileBase();
-
 
 };

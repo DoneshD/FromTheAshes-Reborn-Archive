@@ -76,6 +76,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		if (HitParticles)
 			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
 
+		UE_LOG(LogTemp, Warning, TEXT("Dude"));
+
 		APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(MyOwner);
 		PlayerCharacter->bKunaiLanded = true;
 

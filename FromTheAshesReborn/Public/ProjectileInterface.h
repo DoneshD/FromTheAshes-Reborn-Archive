@@ -24,5 +24,5 @@ class FROMTHEASHESREBORN_API IProjectileInterface
 public:
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 	UFUNCTION()
-	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) = 0;
+	virtual void Print() = 0;
 };

@@ -112,8 +112,9 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	}
 }
 
-void AFTACharacter::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AFTACharacter::Print()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Im an FTA Character"));
 }
 
 void AFTACharacter::DoubleJump()

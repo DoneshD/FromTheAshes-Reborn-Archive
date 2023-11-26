@@ -1,6 +1,8 @@
 #include "ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "MeleeEnemy.h"
+#include "ProjectileInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 AProjectileBase::AProjectileBase()
@@ -24,7 +26,10 @@ void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
 	StartLocation = GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("Construct"));
+
 }
 
 void AProjectileBase::Tick(float DeltaTime)
@@ -40,6 +45,32 @@ void AProjectileBase::Tick(float DeltaTime)
 	if (DistanceDiff.X < NegativeDestroyDistance || DistanceDiff.Y < NegativeDestroyDistance)
 	{
 		DestroyProjectile();
+	}
+}
+
+void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	AActor* MyOwner = GetOwner();
+
+	if (MyOwner == nullptr) {
+		Destroy();
+		return;
+	}
+
+	AController* MyOwnerInstigator = MyOwner->GetInstigatorController();
+
+	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
+	{
+		if (HitParticles)
+			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+
+		IProjectileInterface* Interface = Cast<IProjectileInterface>(Hit.GetActor());
+		if (Interface)
+		{
+			Interface->Print();
+		}
+
 	}
 }
 
