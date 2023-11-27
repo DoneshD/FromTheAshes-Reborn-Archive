@@ -17,8 +17,6 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	ProjectileMovementComponent->MaxSpeed = 20000.f;
 	ProjectileMovementComponent->InitialSpeed = 20000.f;
-
-
 }
 
 void AProjectileBase::BeginPlay()
@@ -33,7 +31,7 @@ void AProjectileBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector DistanceDiff = GetActorLocation() - StartLocation;
+	DistanceDiff = GetActorLocation() - StartLocation;
 	if (DistanceDiff.X > PositiveDestroyDistance || DistanceDiff.Y > PositiveDestroyDistance)
 	{
 		DestroyProjectile();
@@ -72,7 +70,6 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		{
 			PlayerInterface->SetFlank();
 		}
-
 	}
 }
 

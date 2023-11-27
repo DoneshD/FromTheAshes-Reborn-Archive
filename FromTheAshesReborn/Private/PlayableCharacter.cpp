@@ -4,7 +4,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Projectile.h"
 #include "Kunai.h"
 #include "ProjectileBase.h"
 
@@ -908,11 +907,9 @@ void APlayableCharacter::Interact()
 		Kunai = nullptr;
 		if (bFlank)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Flanking"));
 			bFlank = false;
 
 			FHitResult OutHit;
-
 			TArray<AActor*> ActorArray;
 			ActorArray.Add(this);
 
@@ -962,7 +959,7 @@ bool APlayableCharacter::TraceShot(FHitResult& Hit, FVector& EndLocation)
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 2.0f, 0, 1.0f);
+
 	return GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_GameTraceChannel1, Params);
 }
 
@@ -1014,6 +1011,5 @@ void APlayableCharacter::ThrowKunai()
 		}
 	}
 	
-			
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 }

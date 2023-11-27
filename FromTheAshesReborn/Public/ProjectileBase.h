@@ -39,10 +39,9 @@ private:
 
 	float PositiveDestroyDistance = 10000;
 	float NegativeDestroyDistance = -10000;
-	FVector StartLocation;
 
-	AController* GetOwnerController() const;
-	
+	FVector DistanceDiff;
+	FVector StartLocation;
 
 public:
 
