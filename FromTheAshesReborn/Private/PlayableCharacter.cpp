@@ -901,11 +901,11 @@ void APlayableCharacter::PerformComboSurge()
 
 void APlayableCharacter::Interact()
 {
-	if (Projectile && bKunaiLanded)
+	if (Kunai && bKunaiLanded)
 	{
-		this->TeleportTo(Projectile->GetActorLocation(), GetActorRotation());
-		Projectile->Destroy();
-		Projectile = nullptr;
+		this->TeleportTo(Kunai->GetActorLocation(), GetActorRotation());
+		Kunai->Destroy();
+		Kunai = nullptr;
 		if (bFlank)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Flanking"));
@@ -990,12 +990,7 @@ void APlayableCharacter::ThrowKunai()
 
 	LookFire = UKismetMathLibrary::MakeTransform(SocketLocation, LookRotation);
 
-	//Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, LookFire);
-
 	Kunai = GetWorld()->SpawnActor<AKunai>(KunaiClass, LookFire);
-
-	
-
 	
 	if (bKunaiLanded)
 	{

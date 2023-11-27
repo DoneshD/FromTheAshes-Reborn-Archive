@@ -56,6 +56,8 @@ void AFTACharacter::Tick(float DeltaTime)
 
 }
 
+//--------------------------------------------------------- FSM -----------------------------------------------------------------//
+
 EStates AFTACharacter::GetState() const
 {
 	return CurrentState;
@@ -79,6 +81,9 @@ bool AFTACharacter::CanJump()
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	return !IsStateEqualToAny(MakeArray);
 }
+
+//--------------------------------------------------------- Enchanced Input -----------------------------------------------------------------//
+
 
 void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -111,18 +116,19 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
 	}
 }
-
-void AFTACharacter::Print()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Im an FTA Character"));
-}
+//--------------------------------------------------------- Interfaces -----------------------------------------------------------------//
 
 void AFTACharacter::SetKunaiLanded()
 {
 	bKunaiLanded = true;
-
 }
 
+void AFTACharacter::SetFlank()
+{
+	bFlank = true;
+}
+
+//--------------------------------------------------------- Movement -----------------------------------------------------------------//
 
 void AFTACharacter::DoubleJump()
 {

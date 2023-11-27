@@ -73,10 +73,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	virtual void Print() override;
+	virtual void SetKunaiLanded() override;
 
 	UFUNCTION()
-	virtual void SetKunaiLanded() override;
+	virtual void SetFlank() override;
 
 	EStates CurrentState;
 

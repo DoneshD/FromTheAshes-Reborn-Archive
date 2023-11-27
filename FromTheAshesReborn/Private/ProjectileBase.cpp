@@ -1,8 +1,6 @@
 #include "ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "PlayableCharacter.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "MeleeEnemy.h"
 #include "ProjectileInterface.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -29,8 +27,6 @@ void AProjectileBase::BeginPlay()
 
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
 	StartLocation = GetActorLocation();
-	UE_LOG(LogTemp, Warning, TEXT("Construct"));
-
 }
 
 void AProjectileBase::Tick(float DeltaTime)
@@ -51,30 +47,30 @@ void AProjectileBase::Tick(float DeltaTime)
 
 void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-
-	AActor* MyOwner = GetOwner();
-
-	if (MyOwner == nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("Test 1"));
-		Destroy();
+	if (GetOwner() == nullptr) {
+		DestroyProjectile();
 		return;
 	}
 
-	AController* MyOwnerInstigator = MyOwner->GetInstigatorController();
-
-	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
+	if (OtherActor && OtherActor != this && OtherActor != GetOwner())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Test 2"));
 
 		if (HitParticles)
-			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
-
-
-		IProjectileInterface* Interface = Cast<IProjectileInterface>(MyOwner);
-		if (Interface)
 		{
-			Interface->SetKunaiLanded();
-			Interface->Print();
+			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+		}
+
+		IProjectileInterface* PlayerInterface = Cast<IProjectileInterface>(GetOwner());
+		IProjectileInterface* EnemyInterface = Cast<IProjectileInterface>(Hit.GetActor());
+
+		if (PlayerInterface)
+		{
+			PlayerInterface->SetKunaiLanded();
+		}
+
+		if (EnemyInterface)
+		{
+			PlayerInterface->SetFlank();
 		}
 
 	}
@@ -82,7 +78,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 void AProjectileBase::DestroyProjectile()
 {
-	APlayableCharacter* PlayerCharacter = Cast<APlayableCharacter>(GetOwner());
+	IProjectileInterface* PlayerInterface = Cast<IProjectileInterface>(GetOwner());
+	PlayerInterface->SetKunaiLanded();
 	Destroy();
-	PlayerCharacter->bKunaiLanded = true;
 }

@@ -295,29 +295,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Throw Anim")
 	TObjectPtr<UAnimMontage> KunaiThrow;
 
-	//-----------------------------------------Projectile---------------------------------------
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClass;
+	//-----------------------------------------Kunai---------------------------------------
 
 	UPROPERTY(EditDefaultsOnly, Category = "Kunai")
 	TSubclassOf<class AKunai> KunaiClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Kunai")
-	TSubclassOf<class AProjectileBase> ProjectileBaseClass;
-
-	AProjectile* Projectile;
-
-	AProjectileBase* Base;
-
 	AKunai* Kunai;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
-
-	//-----------------------------------------INTERFACE PRACTICE---------------------------------------
 
 };
 

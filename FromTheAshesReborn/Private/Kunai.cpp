@@ -14,8 +14,6 @@ AKunai::AKunai()
 void AKunai::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("Test 3"));
-
 }
 
 

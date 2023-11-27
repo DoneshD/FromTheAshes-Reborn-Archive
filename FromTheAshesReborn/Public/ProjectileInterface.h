@@ -22,9 +22,8 @@ class FROMTHEASHESREBORN_API IProjectileInterface
 	GENERATED_BODY()
 
 public:
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 	UFUNCTION()
-	virtual void Print() = 0;
+	virtual void SetFlank() = 0;
 
 	UFUNCTION()
 	virtual void SetKunaiLanded() = 0;
