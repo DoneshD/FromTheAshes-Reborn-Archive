@@ -4,6 +4,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/ArrowComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -42,6 +43,19 @@ AFTACharacter::AFTACharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
 	CameraComp->bUsePawnControlRotation = false;
+
+	FrontArrow = CreateDefaultSubobject<UArrowComponent>("FrontArrowComp");
+	FrontArrow->SetupAttachment(RootComponent);
+
+	BackArrow = CreateDefaultSubobject<UArrowComponent>("BackArrowComp");
+	BackArrow->SetupAttachment(RootComponent);
+
+	LeftArrow = CreateDefaultSubobject<UArrowComponent>("LeftArrowComp");
+	LeftArrow->SetupAttachment(RootComponent);
+
+	RightArrow = CreateDefaultSubobject<UArrowComponent>("RightArrowComp");
+	RightArrow->SetupAttachment(RootComponent);
+
 }
 
 void AFTACharacter::BeginPlay()

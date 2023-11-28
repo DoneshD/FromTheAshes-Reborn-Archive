@@ -12,6 +12,7 @@
 class UInputMappingContext;
 class UCameraComponent;
 class USpringArmComponent;
+class UArrowComponent;
 
 UCLASS()
 class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter, public IProjectileInterface
@@ -41,6 +42,18 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UArrowComponent> FrontArrow;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UArrowComponent> BackArrow;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UArrowComponent> LeftArrow;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UArrowComponent> RightArrow;
 
 	//Basic controls
 	void Move(const FInputActionInstance& Instance);
