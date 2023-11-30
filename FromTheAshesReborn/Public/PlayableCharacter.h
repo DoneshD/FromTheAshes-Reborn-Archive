@@ -133,7 +133,7 @@ protected:
 
 	//-----------------------------------------Dodge------------------------------------------------
 
-	void Dodge();
+	void InputDodge();
 	void PerformDodge();
 	void DodgeSystem(float X, float Y);
 
@@ -195,13 +195,11 @@ private:
 	bool bHeavyAttackPaused;
 
 	//-----------------------------------------Combo Strings---------------------------------------
-
 	int ComboExtenderIndex = 0;
 	int ComboSurgeCount = 0;
 	float ComboSurgeSpeed = 1.0;
 
 	bool BranchFinisher = false;
-
 	//-----------------------------------------Air attack-------------------------------------------
 	int AirComboIndex;
 	bool bLaunched;

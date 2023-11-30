@@ -230,7 +230,7 @@ void APlayableCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		InputComp->BindAction(Input_LightAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputLightAttack);
 		InputComp->BindAction(Input_HeavyAttack, ETriggerEvent::Started, this, &APlayableCharacter::InputHeavyAttack);
-		InputComp->BindAction(Input_Dodge, ETriggerEvent::Started, this, &APlayableCharacter::Dodge);
+		InputComp->BindAction(Input_Dodge, ETriggerEvent::Started, this, &APlayableCharacter::InputDodge);
 		InputComp->BindAction(Input_LockOn, ETriggerEvent::Started, this, &APlayableCharacter::HardLockOn);
 		InputComp->BindAction(Input_ThrowKunai, ETriggerEvent::Started, this, &APlayableCharacter::ThrowKunai);
 		InputComp->BindAction(Input_Interact, ETriggerEvent::Started, this, &APlayableCharacter::Interact);
@@ -282,7 +282,6 @@ void APlayableCharacter::TimelineFloatReturn(float value)
 	FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, value, false);
 
 	SetActorRotation(InterpRot);
-	UE_LOG(LogTemp, Warning, TEXT("Rotate Actor"))
 }
 
 void APlayableCharacter::OnTimelineFinished()
@@ -491,12 +490,10 @@ void APlayableCharacter::DodgeSystem(float X, float Y)
 			if (bCanRoll)
 			{
 				PlayAnimMontage(ForwardRollAnim);
-				UE_LOG(LogTemp, Warning, TEXT("Roll"));
 			}
 			else
 			{
 				PlayAnimMontage(ForwardDodgeAnim);
-				UE_LOG(LogTemp, Warning, TEXT("Dodge"));
 			}
 		}
 		else if (Y < 0)
@@ -543,17 +540,15 @@ void APlayableCharacter::PerformDodge()
 		if (bCanRoll)
 		{
 			PlayAnimMontage(ForwardRollAnim);
-			UE_LOG(LogTemp, Warning, TEXT("Roll"));
 		}
 		else
 		{
 			PlayAnimMontage(ForwardDodgeAnim);
-			UE_LOG(LogTemp, Warning, TEXT("Dodge"));
 		}
 	}
 }
 
-void APlayableCharacter::Dodge()
+void APlayableCharacter::InputDodge()
 {
 	if (CanDodge())
 	{
@@ -936,7 +931,6 @@ void APlayableCharacter::Interact()
 
 				GetController()->SetControlRotation(InterpRot);
 				SetActorRotation(InterpRot);
-				UE_LOG(LogTemp, Warning, TEXT("Test"));
 			}
 		}
 	}

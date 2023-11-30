@@ -176,15 +176,12 @@ void AFTACharacter::Move(const FInputActionInstance& Instance)
 	ControlRot.Pitch = 0.0f;
 	ControlRot.Roll = 0.0f;
 
-	const FVector2D AxisValue = Instance.GetValue().Get<FVector2D>();
-	InputDirection = AxisValue;
+	InputDirection = Instance.GetValue().Get<FVector2D>();
 
-	// Move forward/back
-	AddMovementInput(ControlRot.Vector(), AxisValue.Y);
+	AddMovementInput(ControlRot.Vector(), InputDirection.Y);
 
-	// Move Right/Left strafe
 	const FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
-	AddMovementInput(RightVector, AxisValue.X);
+	AddMovementInput(RightVector, InputDirection.X);
 }
 
 void AFTACharacter::LookMouse(const FInputActionValue& InputValue)
@@ -192,7 +189,9 @@ void AFTACharacter::LookMouse(const FInputActionValue& InputValue)
 	const FVector2D Value = InputValue.Get<FVector2D>();
 
 	AddControllerYawInput(Value.X);
-	AddControllerPitchInput(-Value.Y);
+
+	//Invert depend on controller or mouse
+	AddControllerPitchInput(Value.Y);
 }
 
 void AFTACharacter::LookStick(const FInputActionValue& InputValue)

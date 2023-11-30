@@ -59,16 +59,16 @@ protected:
 	void Move(const FInputActionInstance& Instance);
 	void LookMouse(const FInputActionValue& InputValue);
 	void LookStick(const FInputActionValue& InputValue);
-	FVector2D InputDirection;
+	
 
 	void DoubleJump();
 	void StopJump();
 
 	//FSM checks
 	bool CanJump();
-	bool CanDodge();
-	
 	bool bCanDodge;
+
+	FVector2D InputDirection;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement")
 	int JumpCount = 0;
@@ -96,4 +96,6 @@ public:
 	bool bKunaiLanded = true;
 
 	bool bFlank = false;
+
+	
 };
