@@ -130,17 +130,6 @@ void AFTACharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		InputComp->BindAction(Input_LookStick, ETriggerEvent::Triggered, this, &AFTACharacter::LookStick);
 	}
 }
-//--------------------------------------------------------- Interfaces -----------------------------------------------------------------//
-
-void AFTACharacter::SetKunaiLanded()
-{
-	bKunaiLanded = true;
-}
-
-void AFTACharacter::SetFlank()
-{
-	bFlank = true;
-}
 
 //--------------------------------------------------------- Movement -----------------------------------------------------------------//
 

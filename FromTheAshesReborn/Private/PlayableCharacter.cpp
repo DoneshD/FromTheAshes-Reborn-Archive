@@ -1011,3 +1011,14 @@ void APlayableCharacter::ThrowKunai()
 	
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 }
+
+
+void APlayableCharacter::SetKunaiLanded()
+{
+	bKunaiLanded = true;
+}
+
+void APlayableCharacter::SetFlank()
+{
+	bFlank = true;
+}

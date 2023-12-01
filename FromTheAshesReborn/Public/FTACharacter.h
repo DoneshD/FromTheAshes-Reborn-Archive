@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EStates.h"
-#include "ProjectileInterface.h"
 #include "InputAction.h"
 #include "FTACharacter.generated.h"
 
@@ -15,7 +14,7 @@ class USpringArmComponent;
 class UArrowComponent;
 
 UCLASS()
-class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter, public IProjectileInterface
+class FROMTHEASHESREBORN_API AFTACharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -85,17 +84,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION()
-	virtual void SetKunaiLanded() override;
-
-	UFUNCTION()
-	virtual void SetFlank() override;
-
 	EStates CurrentState;
 
-	bool bKunaiLanded = true;
-
-	bool bFlank = false;
 
 	
 };
