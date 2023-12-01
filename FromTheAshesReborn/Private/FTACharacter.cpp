@@ -177,10 +177,15 @@ void AFTACharacter::Move(const FInputActionInstance& Instance)
 	ControlRot.Roll = 0.0f;
 
 	InputDirection = Instance.GetValue().Get<FVector2D>();
+	InputDirection.Normalize();
+
+	InputDirection.X = FMath::Clamp(InputDirection.X, -1.0f, 1.0f);
+	InputDirection.Y = FMath::Clamp(InputDirection.Y, -1.0f, 1.0f);
 
 	AddMovementInput(ControlRot.Vector(), InputDirection.Y);
 
-	const FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
+	const FRotationMatrix RotationMatrix(ControlRot);
+	const FVector RightVector = RotationMatrix.GetScaledAxis(EAxis::Y);
 	AddMovementInput(RightVector, InputDirection.X);
 }
 

@@ -456,58 +456,62 @@ void APlayableCharacter::DisableDodge()
 
 void APlayableCharacter::DodgeSystem(float X, float Y)
 {
-	YCardinalMapping.Add(-1, 0);
-	YCardinalMapping.Add(0, 1);
-	YCardinalMapping.Add(1, 2);
-	int CardinalIndex = YCardinalMapping[static_cast<int>(Y)];
+	UE_LOG(LogTemp, Warning, TEXT("X: %f"), X);
+	UE_LOG(LogTemp, Warning, TEXT("Y: %f"), Y);
 
-	if (X < 0.f)
+	if (Y > 0.75)
 	{
 		if (bCanRoll)
 		{
-			PlayAnimMontage(CardinalRollArray[0].SideDodgeArray[CardinalIndex]);
+
 		}
 		else
 		{
-			PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[CardinalIndex]);
+			UE_LOG(LogTemp, Warning, TEXT("Forward"));
+			PlayAnimMontage(ForwardDodgeAnim);
 		}
 	}
-	else if (X > 0.f)
+	else if (Y < -0.75)
 	{
 		if (bCanRoll)
 		{
-			PlayAnimMontage(CardinalRollArray[1].SideDodgeArray[CardinalIndex]);
+
 		}
 		else
 		{
-			PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[CardinalIndex]);
+			UE_LOG(LogTemp, Warning, TEXT("Backward"));
+			PlayAnimMontage(BackDodgeAnim);
+
 		}
 	}
-	else
+	else if (X > 0.75)
 	{
-		if (Y > 0)
+		if (bCanRoll)
 		{
-			if (bCanRoll)
-			{
-				PlayAnimMontage(ForwardRollAnim);
-			}
-			else
-			{
-				PlayAnimMontage(ForwardDodgeAnim);
-			}
+
 		}
-		else if (Y < 0)
+		else
 		{
-			if (bCanRoll)
-			{
-				PlayAnimMontage(BackRollAnim);
-			}
-			else
-			{
-				PlayAnimMontage(BackDodgeAnim);
-			}
+			UE_LOG(LogTemp, Warning, TEXT("Right"));
+			PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[1]);
+
+
 		}
 	}
+	else if (X < -0.75)
+	{
+		if (bCanRoll)
+		{
+
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Left"));
+			PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[1]);
+
+		}
+	}
+	
 }
 
 void APlayableCharacter::SaveDodge()
