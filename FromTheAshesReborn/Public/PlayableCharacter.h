@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlayerInterface.h"
 #include "Components/TimelineComponent.h"
 #include "PlayableCharacter.generated.h"
 
@@ -27,7 +28,7 @@ class UTimelineComponent;
 class UCurveFloat;
 
 UCLASS()
-class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter
+class FROMTHEASHESREBORN_API APlayableCharacter : public AFTACharacter, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -156,14 +157,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Lock On")
 	void RotationToTarget();
-
 	void StopRotation();
 
 	void SoftLockOn(float Distance);
 	void HardLockOn();
 
 	//-----------------------------------------Timelines--------------------------------------------
-
 	void StartBuffer();
 	void StopBuffer();
 
@@ -303,6 +302,16 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	virtual void SetFlank() override;
+
+	UFUNCTION()
+	virtual void SetKunaiLanded() override;
+
+	bool bKunaiLanded = true;
+
+	bool bFlank = false;
 
 };
 

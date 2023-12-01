@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "ProjectileInterface.generated.h"
+#include "PlayerInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UProjectileInterface : public UInterface
+class UPlayerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,9 +16,9 @@ class UProjectileInterface : public UInterface
 /**
  * 
  */
-
-class FROMTHEASHESREBORN_API IProjectileInterface
+class FROMTHEASHESREBORN_API IPlayerInterface
 {
+
 	GENERATED_BODY()
 
 public:

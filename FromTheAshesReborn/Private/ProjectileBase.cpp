@@ -1,7 +1,7 @@
 #include "ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "ProjectileInterface.h"
+#include "PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 AProjectileBase::AProjectileBase()
@@ -57,25 +57,21 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
 		}
-
-		IProjectileInterface* PlayerInterface = Cast<IProjectileInterface>(GetOwner());
-		IProjectileInterface* EnemyInterface = Cast<IProjectileInterface>(Hit.GetActor());
+		
+		IPlayerInterface* PlayerInterface = Cast<IPlayerInterface>(GetOwner());
 
 		if (PlayerInterface)
 		{
 			PlayerInterface->SetKunaiLanded();
-		}
-
-		if (EnemyInterface)
-		{
-			PlayerInterface->SetFlank();
 		}
 	}
 }
 
 void AProjectileBase::DestroyProjectile()
 {
-	IProjectileInterface* PlayerInterface = Cast<IProjectileInterface>(GetOwner());
+	
+	IPlayerInterface* PlayerInterface = Cast<IPlayerInterface>(GetOwner());
 	PlayerInterface->SetKunaiLanded();
 	Destroy();
+	
 }
