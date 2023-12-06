@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyBase.h"
+#include "Characters/EnemyBase.h"
 
 AEnemyBase::AEnemyBase()
 {

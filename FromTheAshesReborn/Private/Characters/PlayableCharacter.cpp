@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-#include "PlayableCharacter.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/GameplayStatics.h"
-
-#include "Kunai.h"
-#include "ProjectileBase.h"
+#include "Characters/PlayableCharacter.h"
+#include "Camera/CameraComponent.h"
+#include "Weaponary/Kunai.h"
 
 #include "Kismet/KismetMathLibrary.h"
-#include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -246,18 +241,6 @@ void APlayableCharacter::EnableRootRotation()
 		GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
 	}
 }
-
-
-void APlayableCharacter::StartBuffer()
-{
-	//TODO 
-}
-
-void APlayableCharacter::StopBuffer()
-{
-	//TODO
-}
-
 
 //------------------------------------------------------------ Timelines -----------------------------------------------------------------//
 
@@ -729,8 +712,6 @@ void APlayableCharacter::PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>>
 	UAnimMontage* AttackMontage = PausedHeavyAttackCombo[NewHeavyAttackIndex];
 	if (AttackMontage)
 	{
-		//StopBuffer();
-		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(250.0f);
 		PlayAnimMontage(AttackMontage);
@@ -769,8 +750,6 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 	UAnimMontage* CurrentMontage = HeavyAttackCombo[AttackIndex];
 	if (CurrentMontage)
 	{
-		//StopBuffer()
-		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(500.0f);
 		PlayAnimMontage(CurrentMontage);
@@ -809,7 +788,6 @@ void APlayableCharacter::InputHeavyAttack()
 	bDodgeSaved = false;
 	bLightAttackSaved = false;
 
-	//AirSlam()
 
 	TArray<EStates> MakeArray = { EStates::EState_Attack };
 	if (IsStateEqualToAny(MakeArray))
@@ -829,8 +807,6 @@ void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 	UAnimMontage* CurrentMontage = ComboExtender[ExtenderIndex];
 	if (CurrentMontage)
 	{
-		//StopBuffer()
-		//StartBuffer();
 		bHeavyAttackPaused = false;
 		SetState(EStates::EState_Attack);
 		SoftLockOn(500.0f);
@@ -858,8 +834,6 @@ void APlayableCharacter::PerformComboFinisher()
 			bHeavyAttackPaused = false;
 			ResetLightAttack();
 			ResetHeavyAttack();
-			//StopBuffer()
-			//StartBuffer();
 			SetState(EStates::EState_Attack);
 			SoftLockOn(500.0f);
 			PlayAnimMontage(ComboBybass);

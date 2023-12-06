@@ -1,5 +1,5 @@
 
-#include "FromTheAshesRebornGameMode.h"
+#include "GameModes/FromTheAshesRebornGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 
 AFromTheAshesRebornGameMode::AFromTheAshesRebornGameMode()

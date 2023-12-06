@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "EStates.h"
+#include "Enums/EStates.h"
 #include "InputAction.h"
 #include "FTACharacter.generated.h"
 

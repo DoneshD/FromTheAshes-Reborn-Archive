@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "PlayerInterface.h"
+#include "Interfaces/PlayerInterface.h"
 #include "Components/TimelineComponent.h"
 #include "PlayableCharacter.generated.h"
 
@@ -62,7 +62,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_Interact;
 
-
 	//-----------------------------------------FSM Reset States-------------------------------------
 
 	UFUNCTION(BlueprintCallable, Category = "FSM")
@@ -83,7 +82,6 @@ protected:
 
 	bool CanAttack();
 	bool CanDodge();
-
 
 	//-----------------------------------------Light Attacks----------------------------------------
 
@@ -131,7 +129,6 @@ protected:
 
 	bool WeaponTrace(TArray<FHitResult>& Hit, FVector& StartLocation, FVector& EndLocation);
 
-
 	//-----------------------------------------Dodge------------------------------------------------
 
 	void InputDodge();
@@ -163,8 +160,6 @@ protected:
 	void HardLockOn();
 
 	//-----------------------------------------Timelines--------------------------------------------
-	void StartBuffer();
-	void StopBuffer();
 
 	UFUNCTION()
 	void TimelineFloatReturn(float value);
@@ -176,7 +171,6 @@ protected:
 
 	void ThrowKunai();
 	bool TraceShot(FHitResult& Hit, FVector& EndLocation);
-	//-----------------------------------------Interact-------------------------------------------------
 
 	void Interact();
 
@@ -221,11 +215,14 @@ private:
 
 	TObjectPtr<AActor> HardTarget;
 	TObjectPtr<AActor> SoftTarget;
+
 	//-----------------------------------------Timers----------------------------------------------
 
 	FTimerHandle AttackPauseHandle;
 	FOnAttackPausedEvent OnAttackPausedEvent;
+
 	//-----------------------------------------Timelines-------------------------------------------
+
 	TObjectPtr<UTimelineComponent> Timeline;
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
@@ -244,6 +241,7 @@ private:
 	bool bExecuting;
 
 	//-----------------------------------------Anim Montages---------------------------------------
+
 	UPROPERTY(EditDefaultsOnly, Category = "Attack Anim")
 	TArray<TObjectPtr<UAnimMontage>> LightAttackCombo;
 

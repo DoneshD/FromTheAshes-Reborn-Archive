@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Kunai.h"
+#include "Weaponary/Kunai.h"
 
 
 AKunai::AKunai()
