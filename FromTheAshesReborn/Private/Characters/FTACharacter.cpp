@@ -61,7 +61,7 @@ AFTACharacter::AFTACharacter()
 void AFTACharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	bCanDodge = true;
+
 }
 
 void AFTACharacter::Tick(float DeltaTime)
