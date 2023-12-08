@@ -140,7 +140,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 	//------------------------------------------------------------ TICK::Targeting -----------------------------------------------------------------//
 
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("bSurgeAttackPaused: %s"), bSurgeAttackPaused ? TEXT("true") : TEXT("false"));
 
 	if (bTargeting && HardTarget)
 	{
@@ -155,8 +154,6 @@ void APlayableCharacter::Tick(float DeltaTime)
 			FVector TargetLocation = HardTarget->GetActorLocation() - ResultVector;
 			FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
 			FRotator InterpRot = FMath::RInterpTo(GetControlRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), 5.f);
-			UE_LOG(LogTemp, Warning, TEXT("Test Tick"));
-
 
 			GetController()->SetControlRotation(InterpRot);
 		}
@@ -578,7 +575,7 @@ void APlayableCharacter::SaveLightAttack()
 		}
 		if (bSurgeAttackPaused)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PerformComboSurge() - Lig!!!!ht"));
+			UE_LOG(LogTemp, Warning, TEXT("PerformComboSurge() - Light"));
 			PerformComboSurge();
 		}
 		else if (HeavyAttackIndex > 1)
@@ -591,6 +588,7 @@ void APlayableCharacter::SaveLightAttack()
 			if (BranchFinisher)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("ComboExtenderFinishers() - Light"));
+				SetState(EStates::EState_Attack);
 				PlayAnimMontage(ComboExtenderFinishers[0]);
 			}
 			else if (HeavyAttackIndex == 0)
@@ -603,7 +601,6 @@ void APlayableCharacter::SaveLightAttack()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Regular Light"));
 			LightAttack();
-			bSurgeAttackPaused = false;
 		}
 	}
 }
@@ -637,7 +634,7 @@ void APlayableCharacter::SaveHeavyAttack()
 				UE_LOG(LogTemp, Warning, TEXT("PerformBranchFinisher() - Heavy"));
 				PlayAnimMontage(ComboExtenderFinishers[1]);
 			}
-			else
+			else if(ComboExtenderIndex == 0)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("PerformComboExtender() - Heavy"));
 				PerformComboExtender(ComboExtenderIndex);
@@ -687,7 +684,6 @@ void APlayableCharacter::SurgeAttackPaused()
 {
 	bSurgeAttackPaused = true;
 	OnAttackSurgePausedEvent.Broadcast();
-
 }
 
 //------------------------------------------------------ Light Attack Actions -----------------------------------------------------------------//
@@ -702,7 +698,6 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 		SetState(EStates::EState_Attack);
 		SoftLockOn(250.0f);
 		PlayAnimMontage(CurrentMontage);
-		bSurgeAttackPaused = false;
 		ResetSurgeCombos();
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
@@ -723,7 +718,6 @@ void APlayableCharacter::LightAttack()
 		//CanLaunch()
 		//DodgeAttacks() SHOULD REFACTOR
 		bHeavyAttackPaused = false;
-		bSurgeAttackPaused = false;
 		ResetHeavyAttack();
 		PerformLightAttack(LightAttackIndex);
 	}
@@ -813,7 +807,6 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 		{
 			HeavyAttackIndex = 0;
 			ClearHeavyAttackPausedTimer();
-			ClearSurgeAttackPausedTimer();
 			bHeavyAttackPaused = false;
 		}
 	}
@@ -860,17 +853,22 @@ void APlayableCharacter::InputHeavyAttack()
 void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 {
 	UAnimMontage* CurrentMontage = ComboExtender[ExtenderIndex];
-	if (CurrentMontage)
+	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
+	if (!IsStateEqualToAny(MakeArray))
 	{
-		bHeavyAttackPaused = false;
-		SetState(EStates::EState_Attack);
-		SoftLockOn(500.0f);
-		ComboExtenderIndex++;
-		PlayAnimMontage(CurrentMontage);
-
-		if (ComboExtenderIndex >= ComboExtender.Num())
+		if (CurrentMontage)
 		{
-			BranchFinisher = true;
+			bHeavyAttackPaused = false;
+			SetState(EStates::EState_Attack);
+			SoftLockOn(500.0f);
+			ResetLightAttack();
+			ComboExtenderIndex++;
+			PlayAnimMontage(CurrentMontage);
+
+			if (ComboExtenderIndex >= ComboExtender.Num())
+			{
+				BranchFinisher = true;
+			}
 		}
 	}
 	else
@@ -911,7 +909,6 @@ void APlayableCharacter::PerformComboSurge()
 	if (!IsStateEqualToAny(MakeArray))
 	{
 		bHeavyAttackPaused = false;
-		bSurging = true;
 		ResetLightAttack();
 		ResetHeavyAttack();
 		SetState(EStates::EState_Attack);
