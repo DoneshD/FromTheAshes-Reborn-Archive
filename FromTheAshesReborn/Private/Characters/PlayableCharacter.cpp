@@ -83,13 +83,16 @@ void APlayableCharacter::ResetDodge()
 void APlayableCharacter::ResetCombos()
 {
 	ComboExtenderIndex = 0;
+	BranchFinisher = false;
+}
+
+void APlayableCharacter::ResetSurgeCombos()
+{
 	ComboSurgeCount = 0;
 	ComboSurgeSpeed = 1.0;
-	BranchFinisher = false;
 	bSurging = false;
 	bSurgeAttackPaused = false;
 	ClearSurgeAttackPausedTimer();
-
 }
 
 void APlayableCharacter::ResetState()
@@ -110,6 +113,7 @@ void APlayableCharacter::ResetState()
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ResetCombos();
+	ResetSurgeCombos();
 	ClearHeavyAttackPausedTimer();
 	ClearSurgeAttackPausedTimer();
 
@@ -136,6 +140,8 @@ void APlayableCharacter::Tick(float DeltaTime)
 	//------------------------------------------------------------ TICK::Targeting -----------------------------------------------------------------//
 
 	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("bSurgeAttackPaused: %s"), bSurgeAttackPaused ? TEXT("true") : TEXT("false"));
+
 	if (bTargeting && HardTarget)
 	{
 		if (GetDistanceTo(HardTarget) < 2000.f)
@@ -597,6 +603,7 @@ void APlayableCharacter::SaveLightAttack()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Regular Light"));
 			LightAttack();
+			bSurgeAttackPaused = false;
 		}
 	}
 }
@@ -650,27 +657,23 @@ void APlayableCharacter::SaveHeavyAttack()
 void APlayableCharacter::StartHeavyAttackPausedTimer()
 {
 	GetWorldTimerManager().SetTimer(HeavyAttackPauseHandle, this, &APlayableCharacter::HeavyAttackPaused, .8, true);
-	UE_LOG(LogTemp, Warning, TEXT("StartHeavyAttackPausedTimer()"));
 }
 
 void APlayableCharacter::ClearHeavyAttackPausedTimer()
 {
 	GetWorldTimerManager().ClearTimer(HeavyAttackPauseHandle);
-	UE_LOG(LogTemp, Warning, TEXT("ClearHeavyAttackPausedTimer()"));
 
 }
 
 void APlayableCharacter::StartSurgeAttackPausedTimer()
 {
 	GetWorldTimerManager().SetTimer(SurgeAttackPauseHandle, this, &APlayableCharacter::SurgeAttackPaused, .8, true);
-	UE_LOG(LogTemp, Warning, TEXT("StartSurgeAttackPausedTimer()"));
 
 }
 
 void APlayableCharacter::ClearSurgeAttackPausedTimer()
 {
 	GetWorldTimerManager().ClearTimer(SurgeAttackPauseHandle);
-	UE_LOG(LogTemp, Warning, TEXT("ClearSurgeAttackPausedTimer()"));
 
 
 }
@@ -678,14 +681,12 @@ void APlayableCharacter::HeavyAttackPaused()
 {
 	bHeavyAttackPaused = true;
 	OnAttackHeavyPausedEvent.Broadcast();
-	UE_LOG(LogTemp, Warning, TEXT("HeavyAttackPaused()"));
 }
 
 void APlayableCharacter::SurgeAttackPaused()
 {
 	bSurgeAttackPaused = true;
 	OnAttackSurgePausedEvent.Broadcast();
-	UE_LOG(LogTemp, Warning, TEXT("SurgeAttackPaused()"));
 
 }
 
@@ -701,6 +702,8 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 		SetState(EStates::EState_Attack);
 		SoftLockOn(250.0f);
 		PlayAnimMontage(CurrentMontage);
+		bSurgeAttackPaused = false;
+		ResetSurgeCombos();
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
 		{
@@ -719,6 +722,8 @@ void APlayableCharacter::LightAttack()
 	{
 		//CanLaunch()
 		//DodgeAttacks() SHOULD REFACTOR
+		bHeavyAttackPaused = false;
+		bSurgeAttackPaused = false;
 		ResetHeavyAttack();
 		PerformLightAttack(LightAttackIndex);
 	}
@@ -794,7 +799,15 @@ void APlayableCharacter::PerformHeavyAttack(int AttackIndex)
 		SoftLockOn(500.0f);
 		PlayAnimMontage(CurrentMontage);
 		StartHeavyAttackPausedTimer();
-		StartSurgeAttackPausedTimer();
+		if (HeavyAttackIndex == 0)
+		{
+			StartSurgeAttackPausedTimer();
+		}
+		else
+		{
+			ClearSurgeAttackPausedTimer();
+			bSurgeAttackPaused = false;
+		}
 		HeavyAttackIndex++;
 		if (HeavyAttackIndex >= HeavyAttackCombo.Num())
 		{
@@ -835,7 +848,6 @@ void APlayableCharacter::InputHeavyAttack()
 	if (IsStateEqualToAny(MakeArray))
 	{
 		bHeavyAttackSaved = true;
-		bSurgeAttackPaused = true;
 	}
 	else
 	{

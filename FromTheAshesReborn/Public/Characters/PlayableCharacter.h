@@ -74,6 +74,7 @@ protected:
 	void ResetAirAttack();
 	void ResetDodge();
 	void ResetCombos();
+	void ResetSurgeCombos();
 
 	//-----------------------------------------Movement---------------------------------------------
 
@@ -205,16 +206,19 @@ private:
 
 	bool BranchFinisher = false;
 	//-----------------------------------------Air attack-------------------------------------------
+
 	int AirComboIndex;
 	bool bLaunched;
 
 	//-----------------------------------------Weapon Collision-------------------------------------
+
 	bool bActiveCollision = false;
 	TObjectPtr<AActor> WCHitActor;
 	TArray<TObjectPtr<AActor>> AlreadyHitActors_L;
 	TArray<TObjectPtr<AActor>> AlreadyHitActors_R;
 
 	//-----------------------------------------Dodge-----------------------------------------------
+
 	bool bDodgeSaved;
 	bool bCanRoll;
 	bool bCanDodge = true;
