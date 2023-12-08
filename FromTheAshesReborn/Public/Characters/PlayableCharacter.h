@@ -9,7 +9,9 @@
 #include "Components/TimelineComponent.h"
 #include "PlayableCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackPausedEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackSurgePausedEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackHeavyPausedEvent);
+
 
 /**
  * 
@@ -110,8 +112,14 @@ protected:
 	UFUNCTION()
 	void HeavyAttackPaused();
 
-	void StartAttackPausedTimer();
-	void ClearAttackPausedTimer();
+	UFUNCTION()
+	void SurgeAttackPaused();
+
+	void StartHeavyAttackPausedTimer();
+	void ClearHeavyAttackPausedTimer();
+
+	void StartSurgeAttackPausedTimer();
+	void ClearSurgeAttackPausedTimer();
 
 	//-----------------------------------------Attack Strings---------------------------------------
 
@@ -185,12 +193,15 @@ private:
 	int HeavyAttackIndex = 0;
 	int NewHeavyAttackIndex = 0;
 	bool bHeavyAttackSaved;
-	bool bHeavyAttackPaused;
+	bool bHeavyAttackPaused = false;
+	bool bSurgeAttackPaused = false;
 
 	//-----------------------------------------Combo Strings---------------------------------------
 	int ComboExtenderIndex = 0;
+
 	int ComboSurgeCount = 0;
 	float ComboSurgeSpeed = 1.0;
+	bool bSurging = false;
 
 	bool BranchFinisher = false;
 	//-----------------------------------------Air attack-------------------------------------------
@@ -218,8 +229,11 @@ private:
 
 	//-----------------------------------------Timers----------------------------------------------
 
-	FTimerHandle AttackPauseHandle;
-	FOnAttackPausedEvent OnAttackPausedEvent;
+	FTimerHandle HeavyAttackPauseHandle;
+	FTimerHandle SurgeAttackPauseHandle;
+	FOnAttackSurgePausedEvent OnAttackSurgePausedEvent;
+	FOnAttackSurgePausedEvent OnAttackHeavyPausedEvent;
+
 
 	//-----------------------------------------Timelines-------------------------------------------
 

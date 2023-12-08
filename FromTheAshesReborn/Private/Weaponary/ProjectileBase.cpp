@@ -2,6 +2,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Interfaces/PlayerInterface.h"
+#include "Interfaces/EnemyInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 AProjectileBase::AProjectileBase()
