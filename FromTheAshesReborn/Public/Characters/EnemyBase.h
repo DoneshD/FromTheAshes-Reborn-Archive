@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "FTACharacter.h"
+#include "Interfaces/EnemyInterface.h"
 #include "EnemyBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FROMTHEASHESREBORN_API AEnemyBase : public AFTACharacter
+class FROMTHEASHESREBORN_API AEnemyBase : public AFTACharacter, public IEnemyInterface
 {
 	GENERATED_BODY()
 
@@ -26,6 +27,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual AEnemyBase* ReturnSelf() override;
 
 	
 };
