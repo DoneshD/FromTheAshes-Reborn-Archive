@@ -86,7 +86,7 @@ void APlayableCharacter::ResetCombos()
 	BranchFinisher = false;
 }
 
-void APlayableCharacter::ResetSurgeCombos()
+void APlayableCharacter::ResetSurgeCombo()
 {
 	ComboSurgeCount = 0;
 	ComboSurgeSpeed = 1.0;
@@ -102,22 +102,15 @@ void APlayableCharacter::ResetState()
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 	}
 
+	SetState(EStates::EState_Nothing);
 	SoftTarget = NULL;
-	bCanDodge = true;
-	bDodgeSaved = false;
-	bCanRoll = false;
-
-	//StopBuffer();
+	ResetDodge();
 	StopRotation();
 	ResetLightAttack();
 	ResetHeavyAttack();
 	ResetAirAttack();
 	ResetCombos();
-	ResetSurgeCombos();
-	ClearHeavyAttackPausedTimer();
-	ClearSurgeAttackPausedTimer();
-
-	SetState(EStates::EState_Nothing);
+	ResetSurgeCombo();
 }
 
 bool APlayableCharacter::CanAttack()
@@ -175,18 +168,23 @@ void APlayableCharacter::Tick(float DeltaTime)
 
 		bool bLeftSuccess = WeaponTrace(Hits, StartLocation, EndLocation);
 
-		//Use INTERFACE
 		for (auto& CurrentHit : Hits)
 		{
-			if (CurrentHit.GetActor())
+			AActor* HitActor = CurrentHit.GetActor();
+			if (HitActor)
 			{
-				WCHitActor = CurrentHit.GetActor();
-			}
-			if (!AlreadyHitActors_L.Contains(CurrentHit.GetActor()))
-			{
-				AlreadyHitActors_L.AddUnique(WCHitActor);
-				//TODO
-				//UGameplayStatics::ApplyDamage()
+				IEnemyInterface* EnemyInterface = Cast<IEnemyInterface>(HitActor);
+				if (EnemyInterface)
+				{
+					WCHitActor = HitActor;
+					
+					if (!AlreadyHitActors_L.Contains(WCHitActor))
+					{
+						AlreadyHitActors_L.AddUnique(WCHitActor);
+						//TODO
+						//UGameplayStatics::ApplyDamage()
+					}
+				}
 			}
 		}
 
@@ -197,15 +195,20 @@ void APlayableCharacter::Tick(float DeltaTime)
 		
 		for (auto& CurrentHit : Hits)
 		{
-			if (CurrentHit.GetActor())
+			AActor* HitActor = CurrentHit.GetActor();
+			if (HitActor)
 			{
-				WCHitActor = CurrentHit.GetActor();
-			}
-			if (!AlreadyHitActors_R.Contains(CurrentHit.GetActor()))
-			{
-				AlreadyHitActors_R.AddUnique(WCHitActor);
-				//TODO
-				//UGameplayStatics::ApplyDamage()
+				IEnemyInterface* EnemyInterface = Cast<IEnemyInterface>(HitActor);
+				if (EnemyInterface)
+				{
+					WCHitActor = HitActor;
+					if (!AlreadyHitActors_R.Contains(CurrentHit.GetActor()))
+					{
+						AlreadyHitActors_R.AddUnique(WCHitActor);
+						//TODO
+						//UGameplayStatics::ApplyDamage()
+					}
+				}
 			}
 		}
 	}
@@ -341,7 +344,6 @@ void APlayableCharacter::SoftLockOn(float Distance)
 {
 	if (!bTargeting && !HardTarget)
 	{
-		//TODO: Find Good Trace and Timing
 		FVector StartLocation = (GetActorLocation() + GetCharacterMovement()->GetLastInputVector() * 100.f);
 		FVector EndLocation = (GetCharacterMovement()->GetLastInputVector() * Distance) + StartLocation;
 		FHitResult OutHit;
@@ -369,7 +371,11 @@ void APlayableCharacter::SoftLockOn(float Distance)
 			AActor* HitActor = OutHit.GetActor();
 			if (HitActor)
 			{
-				SoftTarget = HitActor;
+				IEnemyInterface* EnemyInterface = Cast<IEnemyInterface>(HitActor);
+				if (EnemyInterface)
+				{
+					SoftTarget = HitActor;
+				}
 			}
 		}
 		else
@@ -529,8 +535,6 @@ void APlayableCharacter::PerformDodge()
 {
 	StopRotation();
 	SoftTarget = NULL;
-	//StopBuffer()
-	//StartBuffer();
 	SetState(EStates::EState_Dodge);
 	if (bTargeting)
 	{
@@ -575,31 +579,28 @@ void APlayableCharacter::SaveLightAttack()
 		}
 		if (bSurgeAttackPaused)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PerformComboSurge() - Light"));
 			PerformComboSurge();
 		}
+
+		//move inside else if 
+
 		else if (HeavyAttackIndex > 1)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PerformComboFinisher() - Light"));
-			PerformComboFinisher();
+			PerformComboFinisher(ComboExtenderFinishers[3]);
 		}
 		else if (ComboExtenderIndex > 0)
 		{
 			if (BranchFinisher)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("ComboExtenderFinishers() - Light"));
-				SetState(EStates::EState_Attack);
-				PlayAnimMontage(ComboExtenderFinishers[0]);
+				PerformComboFinisher(ComboExtenderFinishers[0]);
 			}
 			else if (HeavyAttackIndex == 0)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("ComboExtender() - Light"));
 				PerformComboExtender(ComboExtenderIndex);
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Regular Light"));
 			LightAttack();
 		}
 	}
@@ -618,31 +619,25 @@ void APlayableCharacter::SaveHeavyAttack()
 		}
 		if (bHeavyAttackPaused)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PauseCombo()"));
 			NewHeavyCombo();
 		}
 		else if (LightAttackIndex == 3)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ComboExtenderFinishers() - Heavy"));
-			PlayAnimMontage(ComboExtenderFinishers[2]);
-
+			PerformComboFinisher(ComboExtenderFinishers[2]);
 		}
 		else if (LightAttackIndex == 2)
 		{
-			if (BranchFinisher)
+			if(ComboExtenderIndex == 0)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("PerformBranchFinisher() - Heavy"));
-				PlayAnimMontage(ComboExtenderFinishers[1]);
-			}
-			else if(ComboExtenderIndex == 0)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("PerformComboExtender() - Heavy"));
 				PerformComboExtender(ComboExtenderIndex);
+			}
+			else if (BranchFinisher)
+			{
+				PerformComboFinisher(ComboExtenderFinishers[1]);
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Regular Heavy"));
 			HeavyAttack();
 		}
 	}
@@ -677,6 +672,7 @@ void APlayableCharacter::ClearSurgeAttackPausedTimer()
 void APlayableCharacter::HeavyAttackPaused()
 {
 	bHeavyAttackPaused = true;
+	//Not needed, why?
 	OnAttackHeavyPausedEvent.Broadcast();
 }
 
@@ -693,12 +689,10 @@ void APlayableCharacter::PerformLightAttack(int AttackIndex)
 	UAnimMontage* CurrentMontage = LightAttackCombo[AttackIndex];
 	if (CurrentMontage)
 	{
-		//StopBuffer()
-		//StartBuffer();
 		SetState(EStates::EState_Attack);
 		SoftLockOn(250.0f);
 		PlayAnimMontage(CurrentMontage);
-		ResetSurgeCombos();
+		ResetSurgeCombo();
 		LightAttackIndex++;
 		if (LightAttackIndex >= LightAttackCombo.Num())
 		{
@@ -715,8 +709,6 @@ void APlayableCharacter::LightAttack()
 {
 	if (CanAttack())
 	{
-		//CanLaunch()
-		//DodgeAttacks() SHOULD REFACTOR
 		bHeavyAttackPaused = false;
 		ResetHeavyAttack();
 		PerformLightAttack(LightAttackIndex);
@@ -861,7 +853,6 @@ void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 			bHeavyAttackPaused = false;
 			SetState(EStates::EState_Attack);
 			SoftLockOn(500.0f);
-			ResetLightAttack();
 			ComboExtenderIndex++;
 			PlayAnimMontage(CurrentMontage);
 
@@ -877,19 +868,21 @@ void APlayableCharacter::PerformComboExtender(int ExtenderIndex)
 	}
 }
 
-void APlayableCharacter::PerformComboFinisher()
+//add parameter to pass anim montage
+
+void APlayableCharacter::PerformComboFinisher(UAnimMontage* FinisherMontage)
 {
 	TArray<EStates> MakeArray = { EStates::EState_Attack, EStates::EState_Dodge };
 	if (!IsStateEqualToAny(MakeArray))
 	{
-		if (ComboBybass)
+		if (FinisherMontage)
 		{
 			bHeavyAttackPaused = false;
 			ResetLightAttack();
 			ResetHeavyAttack();
 			SetState(EStates::EState_Attack);
 			SoftLockOn(500.0f);
-			PlayAnimMontage(ComboBybass);
+			PlayAnimMontage(FinisherMontage);
 		}
 		else
 		{
@@ -1035,10 +1028,8 @@ void APlayableCharacter::ThrowKunai()
 			Kunai->SetOwner(this);
 		}
 	}
-	
 	//GetWorldTimerManager().SetTimer(FireHandle, this, &AShooterCharacter::FireRateValid, .35, true);
 }
-
 
 void APlayableCharacter::SetKunaiLanded()
 {

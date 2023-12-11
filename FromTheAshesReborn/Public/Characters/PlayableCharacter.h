@@ -74,7 +74,7 @@ protected:
 	void ResetAirAttack();
 	void ResetDodge();
 	void ResetCombos();
-	void ResetSurgeCombos();
+	void ResetSurgeCombo();
 
 	//-----------------------------------------Movement---------------------------------------------
 
@@ -106,14 +106,11 @@ protected:
 
 	//-----------------------------------------Pause Combos-----------------------------------------
 
+	void HeavyAttackPaused();
 	void SelectHeavyPauseCombo();
 	void NewHeavyCombo();
 	void PerformHeavyPauseCombo(TArray<TObjectPtr<UAnimMontage>> PausedHeavyAttackCombo);
 
-	UFUNCTION()
-	void HeavyAttackPaused();
-
-	UFUNCTION()
 	void SurgeAttackPaused();
 
 	void StartHeavyAttackPausedTimer();
@@ -125,7 +122,7 @@ protected:
 	//-----------------------------------------Attack Strings---------------------------------------
 
 	void PerformComboExtender(int ComboExtenderIndex);
-	void PerformComboFinisher();
+	void PerformComboFinisher(UAnimMontage* FinisherMontage);
 	void PerformComboSurge();
 
 	//-----------------------------------------Weapon Collision-------------------------------------
@@ -225,6 +222,7 @@ private:
 	TMap<int, int> YCardinalMapping;
 
 	//-----------------------------------------Lock Ons--------------------------------------------
+
 	bool bTargeting = false;
 	FVector TargetRotateLocation;
 
@@ -237,7 +235,6 @@ private:
 	FTimerHandle SurgeAttackPauseHandle;
 	FOnAttackSurgePausedEvent OnAttackSurgePausedEvent;
 	FOnAttackSurgePausedEvent OnAttackHeavyPausedEvent;
-
 
 	//-----------------------------------------Timelines-------------------------------------------
 
