@@ -219,6 +219,7 @@ private:
 	bool bDodgeSaved;
 	bool bCanRoll;
 	bool bCanDodge = true;
+	bool isDodging = false;
 	TMap<int, int> YCardinalMapping;
 
 	//-----------------------------------------Lock Ons--------------------------------------------

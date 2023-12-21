@@ -185,7 +185,7 @@ void AFTACharacter::LookMouse(const FInputActionValue& InputValue)
 	AddControllerYawInput(Value.X);
 
 	//Invert depend on controller or mouse
-	AddControllerPitchInput(Value.Y);
+	AddControllerPitchInput(-Value.Y);
 }
 
 void AFTACharacter::LookStick(const FInputActionValue& InputValue)

@@ -133,7 +133,7 @@ void APlayableCharacter::Tick(float DeltaTime)
 	//------------------------------------------------------------ TICK::Targeting -----------------------------------------------------------------//
 
 	Super::Tick(DeltaTime);
-
+	
 	if (bTargeting && HardTarget)
 	{
 		if (GetDistanceTo(HardTarget) < 2000.f)
@@ -460,60 +460,19 @@ void APlayableCharacter::DisableDodge()
 
 void APlayableCharacter::DodgeSystem(float X, float Y)
 {
-	UE_LOG(LogTemp, Warning, TEXT("X: %f"), X);
-	UE_LOG(LogTemp, Warning, TEXT("Y: %f"), Y);
-
-	if (Y > 0.75)
+	isDodging = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	FVector StartLocation = (GetActorLocation() + GetCharacterMovement()->GetLastInputVector() * 100.f);
+	FVector DodgeDirection = (GetCharacterMovement()->GetLastInputVector() * 100.0f) + StartLocation;
+	UE_LOG(LogTemp, Warning, TEXT("DodgeDirection: %s"), *DodgeDirection.ToString());
+	if (bCanRoll)
 	{
-		if (bCanRoll)
-		{
-
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Forward"));
-			PlayAnimMontage(ForwardDodgeAnim);
-		}
+		PlayAnimMontage(ForwardRollAnim);
 	}
-	else if (Y < -0.75)
+	else
 	{
-		if (bCanRoll)
-		{
+		PlayAnimMontage(ForwardDodgeAnim);
 
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Backward"));
-			PlayAnimMontage(BackDodgeAnim);
-
-		}
-	}
-	else if (X > 0.75)
-	{
-		if (bCanRoll)
-		{
-
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Right"));
-			PlayAnimMontage(CardinalDodgeArray[1].SideDodgeArray[1]);
-
-
-		}
-	}
-	else if (X < -0.75)
-	{
-		if (bCanRoll)
-		{
-
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Left"));
-			PlayAnimMontage(CardinalDodgeArray[0].SideDodgeArray[1]);
-
-		}
 	}
 }
 
